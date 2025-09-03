@@ -2,13 +2,13 @@ source /opt/workshops/elastic-retry.sh
 export $(curl http://kubernetes-vm:9000/env | xargs)
 
 export INSTRUQT_TRACK_SLUG=o11y--course--field--100-logs-workflow--main
-export INSTRUQT_GIT_REPO=https://github.com/ty-elastic/instruqt_o11y--course--field--100-logs-workflow--main.git
 
 # ------------- CODE
 
 mkdir -p /workspace/workshop
-git clone $INSTRUQT_GIT_REPO /workspace/workshop
+git clone https://github.com/ty-elastic/k8s-otel-finance.git /workspace/workshop
 cd /workspace/workshop
+git checkout $INSTRUQT_TRACK_SLUG
 
 # ------------- FIX Kibana
 
@@ -17,26 +17,7 @@ retry_command_lin check_es_health
 
 # ------------- VIEW
 
-/opt/workshops/elastic-view.sh -v oblt
-
-echo "Hide tour"
-hide_tour() {
-    local http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$KIBANA_URL/internal/kibana/settings" \
-    --header 'Content-Type: application/json' \
-    --header "kbn-xsrf: true" \
-    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
-    --header 'x-elastic-internal-origin: Kibana' \
-    -d '{"changes":{"hideAnnouncements":true}}')
-
-    if echo $http_status | grep -q '^2'; then
-        echo "Disabled Tour: $http_status"
-        return 0
-    else
-        echo "Failed to disable Tour. HTTP status: $http_status"
-        return 1
-    fi
-}
-retry_command_lin hide_tour
+source /workspace/workshop/instruqt/tools/elastic-view.sh
 
 # ------------- AI ASSISTANT
 
@@ -94,6 +75,56 @@ curl -X POST "$ELASTICSEARCH_URL/ua_lookup/_bulk" \
     --header 'Content-Type: application/x-ndjson' \
     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
     --data-binary @ua_lookup.ndjson
+
+# ------------- NETWORKS ENRICHMENT
+
+# curl -X PUT "$ELASTICSEARCH_URL/networks" \
+#     --header 'Content-Type: application/json' \
+#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+#     -d'
+#     {
+#         "mappings": {
+#             "properties": {
+#                 "range": { "type": "ip_range" },
+#                 "isp": { "type": "keyword" }
+#             }
+#         }
+#     }'
+
+# echo '
+# {"index":{}}
+# {"range":"107.80.0.0/16","isp":"AT&T Enterprises, LLC"}
+# {"index":{}}
+# {"range":"186.189.224.0/20","isp":"NSS S.A."}
+# {"index":{}}
+# {"range":"149.254.212.0/24","isp":"T-Mobile(UK) Internet"}
+# {"index":{}}
+# {"range":"95.85.100.0/24","isp":"Turkmentelecom"}
+# {"index":{}}
+# {"range":"101.136.0.0/14","isp":"Asia Pacific Telecom"}
+# ' > networks.ndjson
+
+# curl -X PUT "$ELASTICSEARCH_URL/_enrich/policy/networks-policy" \
+#     --header 'Content-Type: application/json' \
+#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+#     -d'
+#     {
+#         "range": {
+#             "indices": "networks",
+#             "match_field": "range",
+#             "enrich_fields": ["isp"]
+#         }
+#     }'
+
+# curl -X POST "$ELASTICSEARCH_URL/networks/_bulk" \
+#     --header 'Content-Type: application/x-ndjson' \
+#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+#     --data-binary @networks.ndjson
+
+# curl -X POST "$ELASTICSEARCH_URL/_enrich/policy/networks-policy/_execute?wait_for_completion=true" \
+#     --header 'Content-Type: application/json' \
+#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64"
+
 
 # ------------- RBAC
 

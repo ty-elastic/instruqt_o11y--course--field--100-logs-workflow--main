@@ -41,13 +41,13 @@ FROM logs-proxy.otel-default
 
 Let's save it to our dashboard for future use.
 
-1. Click on the Disk icon in the upper-left of the resulting graph
+1. Click on the Disk icon in the upper-right of the resulting graph
 2. Name the visualization
   ```
   Client OSs
   ```
 3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Proxy` (you will need to start typing `Ingress` in the `Search dashboards...` field)
+4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
 5. Click `Save and go to Dashboard`
 6. Once the dashboard has loaded, click the `Save` button in the upper-right
 
@@ -72,13 +72,13 @@ FROM logs-proxy.otel-default
 
 Let's save it to our dashboard for future use.
 
-1. Click on the Disk icon in the upper-left of the resulting graph
+1. Click on the Disk icon in the upper-right of the resulting graph
 2. Name the visualization
   ```
   Client Browsers
   ```
 3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Proxy` (you will need to start typing `Ingress` in the `Search dashboards...` field)
+4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
 5. Click `Save and go to Dashboard`
 6. Once the dashboard has loaded, click the `Save` button in the upper-right
 
@@ -211,6 +211,9 @@ The CIO is concerned about us not testing new browsers sufficiently, and for som
 
 ![5_exports.png](../assets/5_exports.png)
 
+> [!NOTE]
+> In practice, you would setup an email Connector to allow Elasticsearch to automatically email the report to the CIO on the schedule you defined.
+
 # Alert when a new UA is seen
 
 Ideally, we can send an alert whenever a new User Agent is seen. To do that, we need to keep state of what User Agents we've already seen. Fortunately, Elastic [Transforms](https://www.elastic.co/docs/explore-analyze/transforms) makes this easy!
@@ -223,8 +226,8 @@ Transforms run asynchronously in the background, querying data, aggregating it, 
 > Because we are moving quickly, Elasticsearch may take some time to update field lists in the UI. If you encounter a situation where Elasticsearch doesn't recognize one of the fields we just parsed, click the Refresh icon in the upper-right of the Instruqt tab and try again to create the Transform.
 
 1. Go to `Management` > `Stack Management` > `Transforms` using the left-hand navigation pane
-2. Click `Create your first transform`
-3. Select `logs-proxy.otel-default`
+2. Click `Create a transform`
+3. Select `logs-proxy.otel-default` as the data source
 4. Select `Pivot` (if not already selected)
 5. Set `Search filter` to
   ```
@@ -240,7 +243,7 @@ Transforms run asynchronously in the background, querying data, aggregating it, 
   ```
   user_agents
   ```
-10. Set `Time field` to `@timestamp.min` (if not already selected)
+10. Set `Time field` to `min(@timestamp)` (if not already selected)
 11. Set `Continuous mode` on
 12. Set `Delay` under `Continuous mode` to `0s`
 13. Open `Advanced settings`
@@ -286,7 +289,7 @@ Let's create a new alert which will fire whenever a new User Agent is seen. We s
   ```
   ingress
   ```
-13. Set `Related dashboards` to `Ingress Proxy`
+13. Set `Related dashboards` to `Ingress Status`
 14. Click `Create rule`
 15. Click `Save rule` in the resulting pop-up
 
@@ -307,7 +310,7 @@ This will create a new Chrome UA v137. Let's go to our dashboard and see if we c
 
 1. Open the [button label="Elasticsearch"](tab-0) Instruqt tab
 2. Go to `Dashboards` using the left-hand navigation pane
-3. Open `Ingress Proxy` (if it isn't already open)
+3. Open `Ingress Status` (if it isn't already open)
 
 Look at the table of UAs that we added and note the addition of Chrome v137! You'll also note a new active alert `New UA Detected`!
 

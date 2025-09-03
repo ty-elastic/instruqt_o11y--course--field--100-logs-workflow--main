@@ -213,7 +213,7 @@ Let's save this graph to a dashboard for future use.
 
 ![1_save.png](../assets/1_save.png)
 
-1. Click on the Disk icon in the upper-left of the resulting graph
+1. Click on the Disk icon in the upper-right of the resulting graph
 2. Name the visualization
   ```
   Status Code Over Time (ESQL)
@@ -228,7 +228,7 @@ You will be taken to a new dashboard. Let's save it for future reference.
 1. Click the `Save` button in the upper-right
 2. Enter the title of the new dashboard as
   ```
-  Ingress Proxy
+  Ingress Status
   ```
 3. Click `Save`
 
@@ -264,6 +264,9 @@ FROM logs-proxy.otel-default
 9. Click `Save rule` on the pop-up dialog
 
 In practice, this alert is too simple. We probably are okay with a small percentage of non-200 errors for any large scale infrastructure. What we really want is to alert when we violate a SLO. We will revisit this topic in a bit.
+
+> [!NOTE]
+> For the purposes of this workshop, we aren't setting up any Connectors to take action on our alerts. Typically, you would configure one or more [Actions](https://www.elastic.co/docs/explore-analyze/alerts-cases/alerts#rules-actions) when creating an Alert.
 
 # Summary
 

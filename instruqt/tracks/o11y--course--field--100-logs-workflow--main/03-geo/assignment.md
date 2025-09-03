@@ -69,13 +69,13 @@ Wow! It looks like all of our 500 errors are occurring in the `TH` (Thailand) re
 
 In the meantime, this is a useful graph! Let's save it to our dashboard for future use.
 
-1. Click on the Disk icon in the upper-left of the resulting graph
+1. Click on the Disk icon in the upper-right of the resulting graph
 2. Name the visualization
   ```
   Status by Region
   ```
 3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Proxy` (you will need to start typing `Ingress` in the `Search dashboards...` field)
+4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
 4. Click `Save and go to Dashboard`
 5. Once the dashboard has loaded, click the `Save` button in the upper-right
 
@@ -86,8 +86,19 @@ In the meantime, this is a useful graph! Let's save it to our dashboard for futu
 
 Sometimes it is helpful to visualize client geography on a map. Fortunately, Elastic has a built-in Map visualization we can readily use!
 
+First, let's change the map projection from 3D to 2D:
+
 1. Go to `Other tools` > `Maps` using the left-hand navigation pane
-2. Click `Add layer`
+2. Click `Settings` in the upper-right
+3. Under `Display`, set `Projection` to `Mercator`
+4. Click `Keep changes` in the settings fly-out
+
+![3_map1.png](../assets/3_map1.png)
+
+Now let's visualize client access by location and status code:
+
+1. Click `Add layer`
+2. Click the `Elasticsearch` tab under `Add layer`
 3. Select `Documents`
 4. Select `Data view` to `logs-proxy.otel-default`
 5. Set `Geospatial field` to `client.geo.location` (if this field isn't available, refresh the Instruqt virtual browser tab)
@@ -104,7 +115,7 @@ Sometimes it is helpful to visualize client geography on a map. Fortunately, Ela
 16. Set `Select a field` to `http.response.status_code`
 17. Click `Keep changes`
 
-![3_map.png](../assets/3_map.png)
+![3_map2.png](../assets/3_map2.png)
 
 Feel free to scroll around the globe and note the intuitive visualization of client locations and status codes.
 

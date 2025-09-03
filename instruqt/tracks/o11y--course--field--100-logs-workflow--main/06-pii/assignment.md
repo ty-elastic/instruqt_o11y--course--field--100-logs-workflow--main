@@ -33,20 +33,22 @@ In this example, we've created a limited_user with a limited_role which restrict
 
 In the Elasticsearch tab, we are logged in as a user with full privileges. Let's check our access.
 1. Open the [button label="Elasticsearch"](tab-0) tab
-2. Open a log record and click on the `Table` tab in the flyout
-3. Note access to the `client.ip` and `body.text` fields
+2. Open the first log record by clicking on the double arrow icon under `Actions`
+3. Click on the `Table` tab in the flyout
+3. Note that the `client.ip` and `body.text` fields are accessible and shown
 
 In the Elasticsearch (Limited) tab, we are logged in as a user with limited privileges. Let's check our access.
 
 1. Open the [button label="Elasticsearch (Limited)"](tab-1) tab
-2. Open a log record and click on the `Table` tab in the flyout
-3. Note that `client.ip` and `body.text` fields don't exist
+2. Open the first log record by clicking on the double arrow icon under `Actions`
+3. Click on the `Table` tab in the flyout
+4. Note that the `client.ip` and `body.text` fields are not accessible and not shown
 
 Let's change permissions and see what happens:
 
 1. Open the [button label="Elasticsearch"](tab-0) tab
 2. Go to `Management` > `Stack Management` > `Security` > `Roles` using the left-hand navigation pane
-3. Select `limited_viewer`
+3. Find the role `limited_viewer` and click on the pencil icon to the right of that row to edit it
 4. For Indices `logs-proxy.otel-default`, update `Denied fields` to remove `body.text` (it should only contain `client.ip`)
 5. Click `Update role`
 
@@ -55,8 +57,8 @@ Now let's ensure our limited user has access to `body.text`.
 1. Open the [button label="Elasticsearch (Limited)"](tab-1) Instruqt tab
 2. Close the open log record flyout
 3. Run the search query again
-4. Open a log record
-5. Note that `client.ip` doesn't exist, but `body.text` now does!
+4. Open the first log record by clicking on the double arrow icon under `Actions`
+5. Note that `client.ip` field is not accessible, but `body.text` is!
 
 # Limiting retention
 
@@ -116,7 +118,7 @@ Over the course of this lab, we learned about:
 * Setting up RBAC
 * Setting up data retention
 
-We put these technologies to use in a practical workflow which quickly took us from an unknown problem to a definitive Root Cause. Furthermore, we've setup alerts to ensure we aren't caught off-guard in the future. Finally, we built a really nice custom dashboard to help us monitor the health of our Ingress Proxy.
+We put these technologies to use in a practical workflow which quickly took us from an unknown problem to a definitive Root Cause. Furthermore, we've setup alerts to ensure we aren't caught off-guard in the future. Finally, we built a really nice custom dashboard to help us monitor the health of our Ingress Status.
 
 **All of this from just a lowly nginx access file. That's the power of your logs unlocked by Elastic.**
 
