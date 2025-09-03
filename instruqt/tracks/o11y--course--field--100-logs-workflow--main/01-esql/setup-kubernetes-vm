@@ -6,9 +6,8 @@ export INSTRUQT_TRACK_SLUG=o11y--course--field--100-logs-workflow--main
 # ------------- CODE
 
 mkdir -p /workspace/workshop
-git clone https://github.com/ty-elastic/k8s-otel-finance.git /workspace/workshop
+git clone https://github.com/ty-elastic/instruqt_o11y--course--field--100-logs-workflow--main /workspace/workshop
 cd /workspace/workshop
-git checkout $INSTRUQT_TRACK_SLUG
 
 # ------------- FIX Kibana
 
@@ -75,56 +74,6 @@ curl -X POST "$ELASTICSEARCH_URL/ua_lookup/_bulk" \
     --header 'Content-Type: application/x-ndjson' \
     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
     --data-binary @ua_lookup.ndjson
-
-# ------------- NETWORKS ENRICHMENT
-
-# curl -X PUT "$ELASTICSEARCH_URL/networks" \
-#     --header 'Content-Type: application/json' \
-#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
-#     -d'
-#     {
-#         "mappings": {
-#             "properties": {
-#                 "range": { "type": "ip_range" },
-#                 "isp": { "type": "keyword" }
-#             }
-#         }
-#     }'
-
-# echo '
-# {"index":{}}
-# {"range":"107.80.0.0/16","isp":"AT&T Enterprises, LLC"}
-# {"index":{}}
-# {"range":"186.189.224.0/20","isp":"NSS S.A."}
-# {"index":{}}
-# {"range":"149.254.212.0/24","isp":"T-Mobile(UK) Internet"}
-# {"index":{}}
-# {"range":"95.85.100.0/24","isp":"Turkmentelecom"}
-# {"index":{}}
-# {"range":"101.136.0.0/14","isp":"Asia Pacific Telecom"}
-# ' > networks.ndjson
-
-# curl -X PUT "$ELASTICSEARCH_URL/_enrich/policy/networks-policy" \
-#     --header 'Content-Type: application/json' \
-#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
-#     -d'
-#     {
-#         "range": {
-#             "indices": "networks",
-#             "match_field": "range",
-#             "enrich_fields": ["isp"]
-#         }
-#     }'
-
-# curl -X POST "$ELASTICSEARCH_URL/networks/_bulk" \
-#     --header 'Content-Type: application/x-ndjson' \
-#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
-#     --data-binary @networks.ndjson
-
-# curl -X POST "$ELASTICSEARCH_URL/_enrich/policy/networks-policy/_execute?wait_for_completion=true" \
-#     --header 'Content-Type: application/json' \
-#     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64"
-
 
 # ------------- RBAC
 
