@@ -1,0 +1,252 @@
+source /opt/workshops/elastic-retry.sh
+export $(curl http://kubernetes-vm:9000/env | xargs)
+
+export INSTRUQT_TRACK_SLUG=o11y--course--field--100-logs-workflow--main
+export INSTRUQT_GIT_REPO=https://github.com/ty-elastic/instruqt_o11y--course--field--100-logs-workflow--main
+
+# ------------- CODE
+
+mkdir -p /workspace/workshop
+git clone $INSTRUQT_GIT_REPO /workspace/workshop
+cd /workspace/workshop
+git checkout $INSTRUQT_TRACK_SLUG
+
+# ------------- FIX Kibana
+
+kubectl rollout restart deployment/kibana-kb
+retry_command_lin check_es_health
+
+# ------------- VIEW
+
+/opt/workshops/elastic-view.sh -v oblt
+
+echo "Hide tour"
+hide_tour() {
+    local http_status=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$KIBANA_URL/internal/kibana/settings" \
+    --header 'Content-Type: application/json' \
+    --header "kbn-xsrf: true" \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    --header 'x-elastic-internal-origin: Kibana' \
+    -d '{"changes":{"hideAnnouncements":true}}')
+
+    if echo $http_status | grep -q '^2'; then
+        echo "Disabled Tour: $http_status"
+        return 0
+    else
+        echo "Failed to disable Tour. HTTP status: $http_status"
+        return 1
+    fi
+}
+retry_command_lin hide_tour
+
+# ------------- AI ASSISTANT
+
+source /workspace/workshop/instruqt/tools/elastic-completion.sh
+
+# ------------- STREAMS
+
+source /workspace/workshop/instruqt/tools/elastic-streams.sh
+
+# ------------- OTEL
+
+source /workspace/workshop/instruqt/tools/elastic-otel.sh -n trading
+
+# ------------- UA_LOOKUP ENRICHMENT
+
+curl -X PUT "$ELASTICSEARCH_URL/ua_lookup" \
+    --header 'Content-Type: application/json' \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    -d'
+    {
+        "settings": {"index": {"mode": "lookup"}},
+        "mappings": {
+            "properties": {
+                "user_agent.name_and_vmajor": { "type": "keyword" },
+                "release_date": { "type": "date",
+                "format": "MM/dd/YYYY"}
+            }
+        }
+    }'
+
+echo '
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 127","release_date": "06/11/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 129","release_date": "06/13/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 130","release_date": "04/30/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 133","release_date": "05/29/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 136","release_date": "06/04/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome Mobile 128","release_date": "06/13/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome Mobile 130","release_date": "06/11/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome Mobile 131","release_date": "06/25/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome Mobile 132","release_date": "06/20/2024"}
+{"index":{}}
+{"user_agent.name_and_vmajor":"Chrome 126","release_date": "06/18/2024"}
+' > ua_lookup.ndjson
+
+curl -X POST "$ELASTICSEARCH_URL/ua_lookup/_bulk" \
+    --header 'Content-Type: application/x-ndjson' \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    --data-binary @ua_lookup.ndjson
+
+# ------------- RBAC
+
+cat <<EOF >> rbac.json
+{
+  "cluster": [],
+  "indices": [
+    {
+      "names": [
+        "logs-proxy.otel-default"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ],
+      "field_security": {
+        "grant": [
+          "*"
+        ],
+        "except": [
+          "client.ip","body.text"
+        ]
+      },
+      "allow_restricted_indices": false
+    },
+    {
+      "names": [
+        ".slo-observability.*"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ],
+      "allow_restricted_indices": false
+    },
+    {
+      "names": [
+        ".siem-signals*",
+        ".lists-*",
+        ".items-*",
+        ".reindexed-v8-siem-signals*",
+        ".reindexed-v8-lists-*",
+        ".reindexed-v8-items-*"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ],
+      "allow_restricted_indices": false
+    },
+    {
+      "names": [
+        ".alerts*",
+        ".preview.alerts*",
+        ".adhoc.alerts*"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ],
+      "allow_restricted_indices": false
+    },
+    {
+      "names": [
+        "profiling-*",
+        ".profiling-*"
+      ],
+      "privileges": [
+        "read",
+        "view_index_metadata"
+      ],
+      "allow_restricted_indices": false
+    }
+  ],
+  "applications": [
+    {
+      "application": "kibana-.kibana",
+      "privileges": [
+        "read"
+      ],
+      "resources": [
+        "*"
+      ]
+    }
+  ],
+  "run_as": [],
+  "description": "Grants read-only access to all features in Kibana (including Solutions) and to data indices."
+}
+EOF
+
+curl -X POST "$ELASTICSEARCH_URL/_security/role/limited_viewer" \
+    --header 'Content-Type: application/json' \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    -d @rbac.json
+
+curl -X PUT "$ELASTICSEARCH_URL/_security/user/limited_user" \
+    --header 'Content-Type: application/json' \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    -d'
+    {
+        "password": "elastic",
+        "roles": [
+          "limited_viewer"
+        ],
+        "full_name": "",
+        "email": "",
+        "metadata": {},
+        "enabled": true
+    }'
+
+
+# ------------- DEPLOY
+
+./deploy.sh -s trading-logen -o false -c $INSTRUQT_TRACK_SLUG -v $INSTRUQT_TRACK_SLUG
+
+# ------------- WAIT
+
+retry_command_lin curl --silent --fail --output /dev/null --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" "$ELASTICSEARCH_URL/_cat/indices/logs-proxy.otel-default?allow_no_indices=false"
+
+curl -X POST "$ELASTICSEARCH_URL/logs-proxy.otel-default/_rollover" \
+    --header 'Content-Type: application/json' \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64"
+
+echo "Wait for realtime"
+retry_command_lin curl --silent --fail --output /dev/null http://kubernetes-vm:32003/status/realtime
+echo "realtime reached"
+
+dv=$(curl -X POST "$KIBANA_URL/api/data_views/data_view" \
+    --header 'Content-Type: application/json' \
+    --header "kbn-xsrf: true" \
+    --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" \
+    -d'
+    {
+      "data_view": {
+        "namespaces": [
+          "default"
+        ],
+        "title": "logs-proxy.otel-default",
+        "name": "logs-proxy.otel-default",
+        "timeFieldName": "@timestamp"
+      }
+    }')
+
+dv_id=$(echo $dv | jq --compact-output -r '.data_view.id')
+
+echo "Setup DV refresh for $dv_id"
+cat <<EOF >> dataview.sh
+while /bin/true; do
+  curl -s -o /dev/null -X GET "$KIBANA_URL/internal/data_views/fields?pattern=logs-proxy.otel-default&meta_fields=_source&meta_fields=_id&meta_fields=_index&meta_fields=_score&meta_fields=_ignored&allow_no_index=true&apiVersion=1" --header "kbn-xsrf: true" --header 'x-elastic-internal-origin: Kibana' --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64";
+  sleep 1;
+done
+EOF
+chmod a+x dataview.sh
+nohup ./dataview.sh > dataview.log 2>&1 &
+echo "Setup DV refresh...done"

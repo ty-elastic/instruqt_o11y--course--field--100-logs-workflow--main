@@ -1,0 +1,5 @@
+FROM pandoc/extra
+
+RUN apk add font-inter
+
+

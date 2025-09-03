@@ -1,0 +1,19 @@
+flowchart LR
+
+    clients[Frontend Clients]
+
+    subgraph backend[Backend]
+        proxy((nginx Reverse Proxy))
+        style proxy fill:#ffff00,stroke-width:4px
+
+        backend1(Backend Service 1)
+        backend2(Backend Service N)
+        logfile@{ shape: doc, label: "Proxy Log file"}
+        style logfile fill:#ffff00,stroke-width:4px
+        proxy -. log .-> logfile
+    end
+
+    clients == REST ==> proxy
+    proxy == REST ==> backend1
+    proxy == REST ==> backend2
+

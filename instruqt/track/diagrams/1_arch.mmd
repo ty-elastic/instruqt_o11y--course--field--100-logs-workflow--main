@@ -1,0 +1,78 @@
+flowchart TB
+    style logfile fill:#ffff00,stroke-width:4px
+    style datastream fill:#ffff00,stroke-width:4px
+
+    style streams_parse fill:#ffff00,stroke-width:4px
+
+    %% style slo_query fill:#ffff00,stroke-width:4px
+    %% style slo_burn fill:#ffff00,stroke-width:4px
+
+    %% style esql_query fill:#ffff00,stroke-width:4px
+    %% style lookup_index fill:#ffff00,stroke-width:4px
+    style esql_parse fill:#ffff00,stroke-width:4px
+    %% style esql_agg fill:#ffff00,stroke-width:4px
+
+    %% style transforms_query fill:#ffff00,stroke-width:4px
+    %% style transforms_aggregations fill:#ffff00,stroke-width:4px
+    %% style transforms_index fill:#ffff00,stroke-width:4px
+
+    %% style alerts fill:#ffff00,stroke-width:4px
+    %% style visualizations fill:#ffff00,stroke-width:4px
+
+    subgraph elasticsearch[Elasticsearch]
+        datastream@{shape: cyl}
+        visualizations@{ shape: win-pane, label: "Visualizations" }
+        lookup_index@{shape: cyl, label: "Lookup Index"}
+        transforms_index@{shape: cyl, label: "Index"} 
+        alerts@{ shape: manual-file, label: "Alerts"}
+        
+        subgraph streams["Streams"]
+            streams_parse("Parsing<br>(Ingest-Time Parsing)")
+        end
+
+        streams --> datastream
+
+        subgraph esql["ES|QL"]
+            esql_query[\Query/]
+            esql_parse("Parsing<br>(Query-Time Parsing)")
+            esql_agg[/Aggregations/]
+            
+            esql_query --> esql_parse
+            esql_parse --> esql_agg
+            esql_query --> esql_agg
+        end
+
+        subgraph SLO["SLO"]
+            slo_query[\Query/]
+            slo_burn@{ shape: notch-pent, label: "Burn Rate" }
+
+            slo_query --> slo_burn
+        end
+
+        subgraph Transforms
+            transforms_query[\Query/]
+            transforms_aggregations[/Aggregations/]
+
+            transforms_query --> transforms_aggregations
+        end
+
+        datastream --> esql_query
+        datastream --> slo_query
+        datastream --> transforms_query
+
+        esql_query -.-> lookup_index
+
+        slo_burn --> alerts
+
+        transforms_aggregations --> transforms_index
+        transforms_index --> alerts
+
+        esql_agg --> visualizations
+        esql_agg --> alerts
+    end
+
+    logfile@{ shape: doc, label: "Proxy Log file"}
+    logfile -.-> streams
+
+
+    

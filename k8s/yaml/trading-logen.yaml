@@ -1,0 +1,180 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trading
+  labels:
+    name: trading
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: trading
+data:
+  config.yaml: |-
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+
+    processors:
+      batch:
+        send_batch_size: 1000
+        timeout: 1s
+        send_batch_max_size: 1500
+
+    exporters:
+      elasticsearch/otel:
+        endpoints: # List of Elasticsearch endpoints.
+          - ${env:ELASTIC_ENDPOINT}
+        api_key: ${env:ELASTIC_API_KEY} # API key for Elasticsearch authentication.
+        logs_dynamic_index:
+          enabled: true
+        metrics_dynamic_index:
+          enabled: true
+        traces_dynamic_index:
+          enabled: true
+        flush:
+          interval: 1s
+        # Enable in order to skip the SSL certificate Check
+        # tls:
+        #   insecure_skip_verify: true
+        mapping:
+          mode: otel
+
+    service:
+      extensions: [health_check]
+      pipelines:
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [elasticsearch/otel]
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: trading
+    service: collector
+  name: collector
+  namespace: trading
+spec:
+  selector:
+    matchLabels:
+      app: trading
+      service: collector
+  template:
+    metadata:
+      labels:
+        app: trading
+        service: collector
+    spec:
+      containers:
+      - name: collector
+        image: otel/opentelemetry-collector-contrib:0.130.1
+        command:
+          - "/otelcol-contrib"
+          - "--config=/etc/otelcol-contrib/config.yaml"
+        ports:
+          - containerPort: 4317
+          - containerPort: 13133
+        env:
+          - name: ELASTIC_AGENT_OTEL
+            value: '"true"'
+          - name: ELASTIC_ENDPOINT
+            valueFrom:
+              secretKeyRef:
+                name: elastic-secret-otel
+                key: elastic_endpoint
+          - name: ELASTIC_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: elastic-secret-otel
+                key: elastic_api_key
+        volumeMounts:
+        - mountPath: /etc/otelcol-contrib/config.yaml
+          name: data
+          subPath: config.yaml
+          readOnly: true
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: data
+        configMap:
+          name: otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: trading
+    service: collector
+  name: collector
+  namespace: trading
+spec:
+  ports:
+    - name: grpc
+      port: 4317
+      targetPort: 4317
+    - name: hc
+      port: 13133
+      targetPort: 13133
+  selector:
+    app: trading
+    service: collector
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trading-logen
+  namespace: trading
+  labels:
+    app: trading
+    service: trading-logen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: trading
+      service: trading-logen
+  template:
+    metadata:
+      labels:
+        app: trading
+        service: trading-logen
+    spec:
+      initContainers:
+        - name: init-curl
+          image: curlimages/curl
+          command: ["sh", "-c", "until curl --fail http://collector:13133; do echo waiting for collector; sleep 2; done"]
+      containers:
+        - image: $REPO/trading-logen:$COURSE
+          imagePullPolicy: Always
+          name: trading-logen
+          ports:
+            - containerPort: 9003
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: trading
+    service: trading-logen
+  name: trading-logen
+  namespace: trading
+spec:
+  ports:
+    - protocol: TCP
+      nodePort: 32003
+      port: 9003
+  type: NodePort
+  selector:
+    app: trading
+    service: trading-logen
+---
