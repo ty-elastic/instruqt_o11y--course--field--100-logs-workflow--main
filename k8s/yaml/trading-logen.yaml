@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: trading
+  name: $NAMESPACE
   labels:
-    name: trading
+    name: $NAMESPACE
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: otel-collector-config
-  namespace: trading
+  namespace: $NAMESPACE
 data:
   config.yaml: |-
     extensions:
@@ -62,7 +62,7 @@ metadata:
     app: trading
     service: collector
   name: collector
-  namespace: trading
+  namespace: $NAMESPACE
 spec:
   selector:
     matchLabels:
@@ -114,7 +114,7 @@ metadata:
     app: trading
     service: collector
   name: collector
-  namespace: trading
+  namespace: $NAMESPACE
 spec:
   ports:
     - name: grpc
@@ -132,7 +132,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: trading-logen
-  namespace: trading
+  namespace: $NAMESPACE
   labels:
     app: trading
     service: trading-logen
@@ -167,7 +167,7 @@ metadata:
     app: trading
     service: trading-logen
   name: trading-logen
-  namespace: trading
+  namespace: $NAMESPACE
 spec:
   ports:
     - protocol: TCP

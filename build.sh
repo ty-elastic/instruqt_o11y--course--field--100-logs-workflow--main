@@ -5,8 +5,8 @@ local=false
 variant=none
 
 build_service=true
-build_collector=true
-build_lib=true
+build_collector=false
+build_lib=false
 
 while getopts "a:l:c:s:x:y:z:v:" opt
 do

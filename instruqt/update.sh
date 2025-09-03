@@ -12,16 +12,7 @@ done
 
 docker build --platform linux/amd64 -f Dockerfile.pandoc -t pandoc-inter .
 
-# git add -u
-# git commit -m "updates"
-# git push origin main
-# git tag -f -a $course -m $course
-# git push origin $course
-
-git tag -f -a $course -m $course
-git push -f origin $course
-
-for dir in ./courses/*/; do
+for dir in ./tracks/*/; do
   echo $dir
   if [[ -d "$dir" ]]; then
     current_course=$(basename "$dir")
@@ -36,8 +27,8 @@ for dir in ./courses/*/; do
         cd instruqt
       fi
 
-      cp pandoc.tex courses/$current_course/pandoc.tex
-      cd courses/$current_course
+      cp pandoc.tex tracks/$current_course/pandoc.tex
+      cd tracks/$current_course
 
       for diag in diagrams/*.mmd; do
         diag_base=$(basename "$diag")
