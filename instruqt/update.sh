@@ -64,7 +64,7 @@ for dir in ./tracks/*/; do
 
       instruqt track push --force
       cd ../..
-      rm courses/$current_course/pandoc.tex
+      rm tracks/$current_course/pandoc.tex
     fi
   fi
 done
