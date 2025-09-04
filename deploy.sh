@@ -60,8 +60,8 @@ if [ "$otel" = "true" ]; then
     sleep 30
 fi
 
-envsubst < k8s/yaml/_namespace.yaml | kubectl apply -f -
-kubectl label ns $namespace namespace-node-affinity=enabled
+# envsubst < k8s/yaml/_namespace.yaml | kubectl apply -f -
+# kubectl label ns $namespace namespace-node-affinity=enabled
 
 if [ "$service" != "none" ]; then
     for file in k8s/yaml/*.yaml; do
