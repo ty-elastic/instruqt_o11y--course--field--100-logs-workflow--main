@@ -17,19 +17,19 @@ retry_command_lin check_es_health
 
 # ------------- VIEW
 
-source /workspace/workshop/instruqt/tools/elastic-view.sh
+source /workspace/workshop/instruqt/scripts/elastic-view.sh
 
 # ------------- AI ASSISTANT
 
-source /workspace/workshop/instruqt/tools/elastic-completion.sh
+source /workspace/workshop/instruqt/scripts/elastic-completion.sh
 
 # ------------- STREAMS
 
-source /workspace/workshop/instruqt/tools/elastic-streams.sh
+source /workspace/workshop/instruqt/scripts/elastic-streams.sh
 
 # ------------- OTEL
 
-source /workspace/workshop/instruqt/tools/elastic-otel.sh -n trading
+source /workspace/workshop/instruqt/scripts/elastic-otel.sh -n trading
 
 # ------------- UA_LOOKUP ENRICHMENT
 
