@@ -1,7 +1,14 @@
 source /opt/workshops/elastic-retry.sh
 export $(curl http://kubernetes-vm:9000/env | xargs)
 
-/opt/workshops/elastic-llm.sh -m gpt-4o-westus -k false -p false 
+if [[ ! -v LLM_MODEL_ID ]]; then
+    echo "LLM_MODEL_ID not set, defaulting to gpt-4.1"
+    LLM_MODEL_ID="gpt-4.1"
+else
+    echo "LLM_MODEL_ID=$LLM_MODEL_ID"
+fi
+
+/opt/workshops/elastic-llm.sh -m $LLM_MODEL_ID -k false -p false 
 
 # -------------
 
@@ -34,7 +41,7 @@ add_connector() {
     {
         "service": "openai",
         "service_settings": {
-            "model_id": "gpt-4.1",
+            "model_id": "'"$LLM_MODEL_ID"'",
             "api_key": "'"$LLM_APIKEY"'",
             "url": "https://'"$LLM_PROXY_URL"'/v1/chat/completions"
         }
