@@ -8,7 +8,7 @@ else
     echo "LLM_MODEL_ID=$LLM_MODEL_ID"
 fi
 
-/opt/workshops/elastic-llm.sh -m $LLM_MODEL_ID -k false -p false 
+/opt/workshops/elastic-llm.sh -m $LLM_MODEL_ID -k true -d true -p false 
 
 # -------------
 
