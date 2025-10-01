@@ -89,7 +89,7 @@ Execute the following query:
 FROM logs-proxy.otel-default
 | WHERE client.geo.country_iso_code IS NOT NULL AND user_agent.version IS NOT NULL AND http.response.status_code IS NOT NULL
 | EVAL version_major = SUBSTRING(user_agent.version,0,LOCATE(user_agent.version, ".")-1)
-| WHERE user_agent.name == "Chrome" AND TO_INT(version_major) == 136
+| WHERE user_agent.name LIKE "*Chrome*" AND TO_INT(version_major) == 136
 | STATS COUNT() BY client.geo.country_iso_code
 ```
 
