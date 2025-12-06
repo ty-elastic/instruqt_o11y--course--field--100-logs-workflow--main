@@ -29,48 +29,93 @@ Sometimes our data contains PII information which needs to be restricted to a ne
 
 With Elastic's in-built support for [RBAC](https://www.elastic.co/docs/deploy-manage/users-roles/cluster-or-deployment-auth/user-roles), we can limit access at the index, document, or field level.
 
-In this example, we've created a limited_user with a limited_role which restricts access to the `client.ip` and `body.text` fields (to avoid implicitly leaking the `client.ip`).
+In this example, we've created a limited_user with a limited_role which restricts access to the `attributes.client.ip` and `body.text` fields (to avoid implicitly leaking the `attributes.client.ip`).
 
 In the Elasticsearch tab, we are logged in as a user with full privileges. Let's check our access.
 1. Open the [button label="Elasticsearch"](tab-0) tab
 2. Open the first log record by clicking on the double arrow icon under `Actions`
 3. Click on the `Table` tab in the flyout
-3. Note that the `client.ip` and `body.text` fields are accessible and shown
+3. Note that the `attributes.client.ip` and `body.text` fields are accessible and shown
 
 In the Elasticsearch (Limited) tab, we are logged in as a user with limited privileges. Let's check our access.
 
 1. Open the [button label="Elasticsearch (Limited)"](tab-1) tab
 2. Open the first log record by clicking on the double arrow icon under `Actions`
 3. Click on the `Table` tab in the flyout
-4. Note that the `client.ip` and `body.text` fields are not accessible and not shown
+4. Note that the `attributes.client.ip` and `body.text` fields are not accessible and not shown
 
 Let's change permissions and see what happens:
 
 1. Open the [button label="Elasticsearch"](tab-0) tab
 2. Go to `Management` > `Stack Management` > `Security` > `Roles` using the left-hand navigation pane
 3. Find the role `limited_viewer` and click on the pencil icon to the right of that row to edit it
-4. For Indices `logs-proxy.otel-default`, update `Denied fields` to remove `body.text` (it should only contain `client.ip`)
+4. For Indices `logs-proxy.otel-default`, update `Denied fields` to remove `body.text` (it should only contain `attributes.client.ip`)
 5. Click `Update role`
 
-Now let's ensure our limited user has access to `body.text`.
+Now let's ensure our limited user has access to a redacted `body.text`.
 
 1. Open the [button label="Elasticsearch (Limited)"](tab-1) Instruqt tab
 2. Close the open log record flyout
 3. Run the search query again
 4. Open the first log record by clicking on the double arrow icon under `Actions`
-5. Note that `client.ip` field is not accessible, but `body.text` is!
+5. Note that `attributes.client.ip` is not accessible, but `body.text` is (in redacted form)
+
+## Redaction
+
+We can further add a Redaction processor to remove `attributes.client.ip` from `body.text`:
+
+1. Open the [button label="Elasticsearch"](tab-0) tab
+2. Go to `Streams` using the left-hand navigation pane
+3. Select `logs-proxy.otel-default` from the list of Streams.
+4. Select the `Processing` tab
+5. Select `Create processor` from the menu `Create`
+6. Select the `Manual pipeline configuration` Processor
+7. Set the `Ingest pipeline processors` field to:
+  ```
+  [
+    {
+      "redact": {
+        "field": "body.text",
+        "patterns": [
+          "%{IP:client_ip}"
+        ],
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    }
+  ]
+  ```
+8. Click `Create`
+9. Click `Save changes` in the bottom-right
+10. Click `Confirm changes` in the resulting dialog
+
+> [!NOTE]
+> This redaction will apply to ALL roles, not just the limited viewer
+
+Now let's jump back to Discover by clicking `Discover` in the left-hand navigation pane.
+
+Execute the following query:
+```esql
+FROM logs-proxy.otel-default
+```
+
+1. Open the first log record by clicking on the double arrow icon under `Actions`
+2. Click on the `Table` tab in the flyout
+3. Note that any presence of the client's ip address in `body.text` has been redacted as `<client_ip>`, yet non-limited viewers will still be able to see client ip explicitly in the field `attributes.client.ip`
 
 # Limiting retention
 
 Say your records department requires you to keep these logs generally accessible only for a very specific period of time. We can ask Elasticsearch to automatically delete them after some number of days.
 
-1. Open the [button label="Elasticsearch"](tab-0) Instruqt tab
-2. Go to `Streams` using the left-hand navigation pane
-3. Select `logs-proxy.otel-default` from the list of Streams
-4. Click on the `Data retention` tab
-5. Click `Edit data retention`
-6. Select `Set specific retention days`
+1. Navigate to `Streams` using the left-hand navigation pane
+2. Select `logs-proxy.otel-default` from the list of Streams
+3. Click on the `Retention` tab
+4. Click `Edit data retention`
+5. Uncheck `Use the stream’s index template retention configuration`
+6. Select `Custom period`
 7. Set to `30` days
+
+![6_retention.png](../assets/6_retention.png)
 
 Elasticsearch will now remove this data from its online indices after 30 days. At that time, it will only be available in backups.
 
@@ -98,7 +143,7 @@ And what we've done:
 * Created a nightly report to snapshot our dashboard
 * Created an alert to let us know when a new User Agent string appears
 * Setup RBAC to restrict access to `client.ip`
-* Setup retention to keep the logs online for only 30 days
+* Setup Redaction to remove IP addresses from the log message body
 
 # Wrap-Up
 

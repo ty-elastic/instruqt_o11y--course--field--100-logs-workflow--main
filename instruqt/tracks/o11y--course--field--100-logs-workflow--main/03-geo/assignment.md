@@ -26,22 +26,41 @@ We can add the Elastic [GeoIP](https://www.elastic.co/docs/reference/enrich-proc
 
 1. Select `logs-proxy.otel-default` from the list of Streams.
 2. Select the `Processing` tab
-3. Click `Add a processor`
-4. Select the `GeoIP` Processor
-5. Set the `Field` to
+3. Select `Create processor` from the menu `Create`
+4. Select the `Manual pipeline configuration` Processor
+5. Set the `Ingest pipeline processors` field to:
   ```
-  client.ip
+  [
+    {
+      "geoip": {
+        "field": "attributes.client.ip",
+        "target_field": "client.geo",
+        "ignore_missing": true
+      }
+    }
+  ]
   ```
-6. Open `Optional fields`
-7. Set `Target field` to
-  ```
-  client.geo
-  ```
-8. Set `Ignore missing` to true
-9. Click `Add processor`
-10. Click `Save changes` in the bottom-right
+6. Click `Create`
+7. Click `Save changes` in the bottom-right
+8. Click `Confirm changes` in the resulting dialog
 
 ![3_geo.png](../assets/3_geo.png)
+
+## Setting field mappings
+
+Now we need to map several of our new fields to the proper field type.
+
+1. Select the `Schema` tab
+2. Search for field `client.geo`
+3. Click on the ellipse on the right-hand side of the `client.geo.location.lat` row and select `Map as geo field`
+4. Click `Stage changes` in the resulting dialog
+5. Click on the ellipse on the right-hand side of the `client.geo.country_iso_code` row and select `Map field`
+6. Set `Type` to `Keyword`
+7. Click `Stage changes` in the resulting dialog
+8. Click `Submit changes` in the bottom-right
+9. Click `Confirm changes` in the resulting dialog
+
+![3_mappings.png](../assets/3_mappings.png)
 
 ## Analyzing with Discover
 
@@ -52,9 +71,9 @@ Adjust the time field to show the last 3 hours of data.
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
-| WHERE client.geo.country_iso_code IS NOT NULL AND http.response.status_code IS NOT NULL
-| STATS COUNT() BY http.response.status_code, client.geo.country_iso_code
-| SORT http.response.status_code DESC
+| WHERE client.geo.country_iso_code IS NOT NULL AND attributes.http.response.status_code IS NOT NULL
+| STATS COUNT() BY attributes.http.response.status_code, client.geo.country_iso_code
+| SORT attributes.http.response.status_code DESC
 ```
 
 Let's make this a pie chart to allow for more intuitive visualization.

@@ -91,6 +91,7 @@ Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full
 ```
@@ -100,6 +101,7 @@ This is good, but it would also be helpful, based on our experience here, to kno
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
@@ -125,6 +127,7 @@ We built this table by hand; it is far from comprehensive. Now let's use `LOOKUP
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | EVAL user_agent.name_and_vmajor = SUBSTRING(user_agent.full, 0, LOCATE(user_agent.full, ".")-1) // simplify user_agent
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.name_and_vmajor, client.geo.country_iso_code
@@ -144,6 +147,7 @@ Fortunately, Elastic makes it possible to leverage an external Large Language Mo
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
@@ -153,7 +157,7 @@ FROM logs-proxy.otel-default
 | EVAL prompt = CONCAT(
    "when did this version of this browser come out? output only a version of the format mm/dd/yyyy",
    "browser: ", user_agent.full
-  ) | COMPLETION release_date = prompt WITH openai_completion // call out to LLM for each record
+  ) | COMPLETION release_date = prompt WITH {"inference_id" : "openai_completion"} // call out to LLM for each record
 | EVAL release_date = DATE_PARSE("MM/dd/YYYY", release_date)
 | KEEP release_date, first_country_iso_code, user_agent.full, first_seen, last_seen
 ```
@@ -172,23 +176,14 @@ Let's save this search for future reference:
   ```
 3. Click `Save`
 
-Saving an ES|QL query allows others on our team to easily re-run it on demand. By saving the query, we can also add it to our dashboard!
-
-## Adding our table to a dashboard
-
-1. Click `Dashboards` in the left-hand navigation pane
-2. Open the `Ingress Status` dashboard (if it isn't already open)
-3. Click `Add from library`
-4. Find and select `ua_release_dates`
-5. Close the fly-out
-6. Click `Save` to save the dashboard
+Saving an ES|QL query allows others on our team to easily re-run it on demand.
 
 # Organizing our dashboard
 
 As we are adding panels to our dashboard, we can group them into collapsible sections.
 
-1. Click on `Add panel`
-2. Select `Collapsible Section`
+1. Go to `Dashboards` using the left-hand navigation pane and open `Ingress Status` if it is not already open
+2. Click on `Add` and select `Collapsible Section`
 3. Click on the Pencil icon to the right of the name of the new collapsible section
 4. Name the collapsible section
   ```
@@ -196,7 +191,7 @@ As we are adding panels to our dashboard, we can group them into collapsible sec
   ```
 5. Click the green check box next to the name of the collapsible section
 6. Open the collapsible section (if it isn't already) by clicking on the open/close arrow to the left of the collapsible section name
-7. Drag the `ua_release_dates` table, the `Client Browsers` pie chart, and the `Client OSs` treemap into the body below the `User Agent` collapsible section
+7. Drag the `Client Browsers` pie chart, and the `Client OSs` treemap into the body below the `User Agent` collapsible section
 8. Click `Save` to save the dashboard
 
 Feel free to create additional collapsible sections to group and organize other visualizations on our dashboard.
@@ -225,15 +220,15 @@ Transforms run asynchronously in the background, querying data, aggregating it, 
 > [!NOTE]
 > Because we are moving quickly, Elasticsearch may take some time to update field lists in the UI. If you encounter a situation where Elasticsearch doesn't recognize one of the fields we just parsed, click the Refresh icon in the upper-right of the Instruqt tab and try again to create the Transform.
 
-1. Go to `Management` > `Stack Management` > `Transforms` using the left-hand navigation pane
+1. Go to `Data management` > `Transforms` using the left-hand navigation pane
 2. Click `Create a transform`
 3. Select `logs-proxy.otel-default` as the data source
 4. Select `Pivot` (if not already selected)
 5. Set `Search filter` to
   ```
-  user_agent.full :*
+  user_agent.name :*
   ```
-6. Set `Group by` to `terms(user_agent.full)`
+6. Set `Group by` to `terms(user_agent.name)` and `terms(user_agent.version)`
 7. Add an aggregation for `@timestamp.min`
 8. Click `> Next`
 
@@ -273,10 +268,7 @@ Let's create a new alert which will fire whenever a new User Agent is seen. We s
 6. Change `IS ABOVE` to `IS ABOVE OR EQUALS`
 7. Set `IS ABOVE OR EQUALS` to `1`
 8. Set `FOR THE LAST` to `1 minute`
-9. Set `Group alerts by (optional)` to
-  ```
-  user_agent.full
-  ```
+9. Set `Group alerts by (optional)` to `user_agent.name` and `user_agent.version`
 10. Set `Rule schedule` to `1 seconds`
 
 ![5_alert1.png](../assets/5_alert1.png)

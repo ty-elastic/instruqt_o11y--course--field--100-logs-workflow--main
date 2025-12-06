@@ -4,17 +4,16 @@ title: 'Observability 100: A Modern Logging Workflow'
 description: A hands-on workshop showcasing the latest Elasticsearch log analytics
   employed in a practical workflow to debug a problem
 icon: ""
-tags:
-- otel-200
+tags: []
 owner: elastic
 developers:
 - tyrone.bekiares@elastic.co
 show_timer: true
-idle_timeout: 900
-timelimit: 7200
-sandbox_preset: managed-elastic-9-1-0
+idle_timeout: 21600
+timelimit: 43200
+sandbox_preset: managed-elastic-9-3-0
 lab_config:
-  extend_ttl: 900
+  extend_ttl: 3600
   sidebar_enabled: true
   feedback_recap_enabled: true
   feedback_tab_enabled: false
@@ -24,5 +23,5 @@ lab_config:
     name: modern-dark
   override_challenge_layout: false
   hideStopButton: false
-checksum: "15297522164402341375"
+checksum: "13614694310680252154"
 enhanced_loading: false
