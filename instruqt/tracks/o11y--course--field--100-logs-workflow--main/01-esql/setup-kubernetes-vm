@@ -10,11 +10,6 @@ mkdir -p /workspace/workshop
 git clone $GITHUB_REPO /workspace/workshop
 cd /workspace/workshop
 
-# ------------- FIX Kibana
-
-kubectl rollout restart deployment/kibana-kb
-retry_command_lin check_es_health
-
 # ------------- VIEW
 
 source /workspace/workshop/instruqt/scripts/elastic-view.sh

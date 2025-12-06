@@ -12,7 +12,7 @@ developers:
 show_timer: true
 idle_timeout: 900
 timelimit: 7200
-sandbox_preset: managed-elastic-9-1-0
+sandbox_preset: managed-elastic-9-2-1
 lab_config:
   extend_ttl: 900
   sidebar_enabled: true
