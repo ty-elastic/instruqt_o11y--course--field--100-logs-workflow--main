@@ -60,20 +60,6 @@ Now let's ensure our limited user has access to `body.text`.
 4. Open the first log record by clicking on the double arrow icon under `Actions`
 5. Note that `client.ip` field is not accessible, but `body.text` is!
 
-# Limiting retention
-
-Say your records department requires you to keep these logs generally accessible only for a very specific period of time. We can ask Elasticsearch to automatically delete them after some number of days.
-
-1. Open the [button label="Elasticsearch"](tab-0) Instruqt tab
-2. Go to `Streams` using the left-hand navigation pane
-3. Select `logs-proxy.otel-default` from the list of Streams
-4. Click on the `Data retention` tab
-5. Click `Edit data retention`
-6. Select `Set specific retention days`
-7. Set to `30` days
-
-Elasticsearch will now remove this data from its online indices after 30 days. At that time, it will only be available in backups.
-
 # Summary
 
 Let's take stock of what we know:

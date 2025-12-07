@@ -157,7 +157,7 @@ FROM logs-proxy.otel-default
 | EVAL prompt = CONCAT(
    "when did this version of this browser come out? output only a version of the format mm/dd/yyyy",
    "browser: ", user_agent.full
-  ) | COMPLETION release_date = prompt WITH openai_completion // call out to LLM for each record
+  ) | COMPLETION release_date = prompt WITH {"inference_id" : "openai_completion"} // call out to LLM for each record
 | EVAL release_date = DATE_PARSE("MM/dd/YYYY", release_date)
 | KEEP release_date, first_country_iso_code, user_agent.full, first_seen, last_seen
 ```
@@ -176,16 +176,7 @@ Let's save this search for future reference:
   ```
 3. Click `Save`
 
-Saving an ES|QL query allows others on our team to easily re-run it on demand. By saving the query, we can also add it to our dashboard!
-
-## Adding our table to a dashboard
-
-1. Click `Dashboards` in the left-hand navigation pane
-2. Open the `Ingress Status` dashboard (if it isn't already open)
-3. Click `Add from library`
-4. Find and select `ua_release_dates`
-5. Close the fly-out
-6. Click `Save` to save the dashboard
+Saving an ES|QL query allows others on our team to easily re-run it on demand.
 
 # Organizing our dashboard
 
@@ -200,7 +191,7 @@ As we are adding panels to our dashboard, we can group them into collapsible sec
   ```
 5. Click the green check box next to the name of the collapsible section
 6. Open the collapsible section (if it isn't already) by clicking on the open/close arrow to the left of the collapsible section name
-7. Drag the `ua_release_dates` table, the `Client Browsers` pie chart, and the `Client OSs` treemap into the body below the `User Agent` collapsible section
+7. Drag the `Client Browsers` pie chart, and the `Client OSs` treemap into the body below the `User Agent` collapsible section
 8. Click `Save` to save the dashboard
 
 Feel free to create additional collapsible sections to group and organize other visualizations on our dashboard.

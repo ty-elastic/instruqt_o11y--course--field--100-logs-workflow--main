@@ -59,8 +59,6 @@ Now we need to map several of our new fields to the proper field type.
 9. Click `Submit changes` in the bottom-right
 10. Click `Confirm changes` in the resulting dialog
 
-![3_geo.png](../assets/3_geo.png)
-
 ## Analyzing with Discover
 
 Jump back to Discover by clicking `Discover` in the left-hand navigation pane.

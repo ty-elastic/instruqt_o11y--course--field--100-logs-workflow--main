@@ -63,7 +63,7 @@ The nginx log line includes a timestamp; let's use that as our record timestamp.
 3. Click the ellipse on the far right of the `attributes.http.response.status_code` row
 4. Select `Map field`
 5. Set the type to `Number (long)`
-6. Click `Stage changes` 
+6. Click `Stage changes`
 
 ## Saving our processors
 

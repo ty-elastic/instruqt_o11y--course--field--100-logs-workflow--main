@@ -91,7 +91,7 @@ cat <<EOF >> rbac.json
           "*"
         ],
         "except": [
-          "client.ip","body.text"
+          "attributes.client.ip","body.text"
         ]
       },
       "allow_restricted_indices": false

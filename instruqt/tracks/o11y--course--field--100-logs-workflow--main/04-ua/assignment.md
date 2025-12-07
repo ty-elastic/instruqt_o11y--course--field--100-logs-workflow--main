@@ -48,15 +48,19 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 ## Setting field mappings
 
 1. Click the `Modified fields` tab
-2. Find the field `user_agent.name`
-3. Click the ellipse on the far right of the `user_agent.name` row
-4. Select `Map field`
-5. Set the type to `Keyword`
-6. Find the field `user_agent.version`
-7. Click the ellipse on the far right of the `user_agent.version` row
-8. Select `Map field`
-9. Set the type to `Keyword`
-10. Click `Stage changes` 
+2. Click the ellipse on the far right of the `user_agent.name` row
+3. Select `Map field`
+4. Set the type to `Keyword`
+5. Click the ellipse on the far right of the `user_agent.version` row
+6. Select `Map field`
+7. Set the type to `Keyword`
+8. Click the ellipse on the far right of the `user_agent.os.name` row
+9. Select `Map field`
+10. Set the type to `Keyword`
+11. Click the ellipse on the far right of the `user_agent.os.version` row
+12. Select `Map field`
+13. Set the type to `Keyword`
+14. Click `Stage changes`
 
 ## Analyzing with Discover
 
