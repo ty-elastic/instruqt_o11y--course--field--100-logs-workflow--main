@@ -27,18 +27,17 @@ data:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
+      
+      streams_wired:
+        - context: resource
+          statements:
+            - set(attributes["elasticsearch.index"], "logs")
 
     exporters:
       elasticsearch/otel:
         endpoints: # List of Elasticsearch endpoints.
           - ${env:ELASTIC_ENDPOINT}
         api_key: ${env:ELASTIC_API_KEY} # API key for Elasticsearch authentication.
-        logs_dynamic_index:
-          enabled: true
-        metrics_dynamic_index:
-          enabled: true
-        traces_dynamic_index:
-          enabled: true
         flush:
           interval: 1s
         # Enable in order to skip the SSL certificate Check
@@ -52,7 +51,7 @@ data:
       pipelines:
         logs:
           receivers: [otlp]
-          processors: [batch]
+          processors: [streams_wired, batch]
           exporters: [elasticsearch/otel]
 ---
 apiVersion: apps/v1
@@ -76,7 +75,7 @@ spec:
     spec:
       containers:
       - name: collector
-        image: otel/opentelemetry-collector-contrib:0.130.1
+        image: otel/opentelemetry-collector-contrib:0.141.0
         command:
           - "/otelcol-contrib"
           - "--config=/etc/otelcol-contrib/config.yaml"
