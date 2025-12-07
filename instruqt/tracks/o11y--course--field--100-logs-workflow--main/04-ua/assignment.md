@@ -24,38 +24,39 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 
 1. Select `logs-proxy.otel-default` from the list of Streams.
 2. Select the `Processing` tab
-3. Select `Add a processor`
-4. Select the `User agent` Processor
-5. Set the `Field` to
+3. Select `Create processor` from the menu `Create`
+4. Select the `Manual pipeline configuration` Processor
+5. Set the `Ingest pipeline processors` field to:
   ```
-  user_agent.original
+  [
+    {
+      "user_agent": {
+        "field": "resource.attributes.user_agent.original",
+        "target_field": "user_agent",
+        "extract_device_type": true,
+        "ignore_missing": true
+      }
+    }
+  ]
   ```
-6. Set `Ignore missing` to true
-7. Click `Add processor`
+6. Click `Create`
+7. Click `Save changes` in the bottom-right
+8. Click `Confirm changes` in the resulting dialog
 
 ![4_ua1.png](../assets/4_ua1.png)
 
-## Adding the Set processor
+## Setting field mappings
 
-In addition to the fields produced by the User Agent processor, we also want a simplified combination of browser name and version. We can easily craft one using the [Set](https://www.elastic.co/docs/reference/enrich-processor/set-processor) processor.
-
-1. Click `Add a processor`
-2. Select the `Set` Processor
-3. Set `Field` to
-  ```
-  user_agent.full
-  ```
-4. Set `Value` to
-  ```
-  {{user_agent.name}} {{user_agent.version}}
-  ```
-5. Click `Ignore failures for this processor`
-6. Click `Add processor`
-7. Click `Save changes` in the bottom-right
-
-![4_ua2.png](../assets/4_ua2.png)
-
-This processor will add a new field `user_agent.full` to each document composed the `user_agent.name` and `user_agent.version` fields concatenated together.
+1. Click the `Modified fields` tab
+2. Find the field `user_agent.name`
+3. Click the ellipse on the far right of the `user_agent.name` row
+4. Select `Map field`
+5. Set the type to `Keyword`
+6. Find the field `user_agent.version`
+7. Click the ellipse on the far right of the `user_agent.version` row
+8. Select `Map field`
+9. Set the type to `Keyword`
+10. Click `Stage changes` 
 
 ## Analyzing with Discover
 
@@ -64,6 +65,7 @@ Now let's jump back to Discover by clicking `Discover` in the left-hand navigati
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS good = COUNT(http.response.status_code < 400 OR NULL), bad = COUNT(http.response.status_code >= 400 OR NULL) BY user_agent.full
 | SORT bad DESC
@@ -73,7 +75,7 @@ Ah-ha, there is more to the story! It appears our errors may be isolated to a sp
 
 ```esql
 FROM logs-proxy.otel-default
-| WHERE user_agent.full IS NOT NULL
+| WHERE user_agent.version IS NOT NULL
 | STATS good = COUNT(http.response.status_code < 400 OR NULL), bad = COUNT(http.response.status_code >= 400 OR NULL) BY user_agent.version
 | SORT bad DESC
 ```

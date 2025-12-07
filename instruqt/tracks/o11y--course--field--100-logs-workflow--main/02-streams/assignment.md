@@ -29,7 +29,7 @@ We will be working with Elastic [Streams](https://www.elastic.co/docs/solutions/
 
 We can parse our nginx log messages at ingest-time using the Elastic [Grok](https://www.elastic.co/docs/reference/enrich-processor/grok-processor) processor.
 
-1. Click `Add a processor`
+1. Select `Create processor` from the menu `Create your first step`
 2. Select the `Grok` Processor (if not already selected)
 3. Set the `Field` to
   ```
@@ -38,9 +38,9 @@ We can parse our nginx log messages at ingest-time using the Elastic [Grok](http
 4. Click `Generate pattern`. Elasticsearch will analyze your log lines and try to determine a suitable grok pattern.
 5. To ensure a consistent lab experience, copy the following grok expression and paste it into the `Grok patterns` field (_do not_ click the `Accept` button next to the generated pattern)
 ```
-%{IPV4:client.ip} - %{NOTSPACE:client.user} \[%{HTTPDATE:timestamp}\] "%{WORD:http.request.method} %{URIPATH:http.request.url.path} HTTP/%{NUMBER:http.version}" %{NUMBER:http.response.status_code:int} %{NUMBER:http.response.body.bytes:int} "%{DATA:http.request.referrer}" "%{GREEDYDATA:user_agent.original}"
+%{IPV4:attributes.client.ip}\s-\s-\s\[%{HTTPDATE:attributes.custom.timestamp}\]\s"%{WORD:attributes.http.request.method_original} /(?<attributes.url.path>%{WORD}/%{WORD}) (?<attributes.http.version>%{WORD}/%{INT}\.%{INT})"\s%{INT:attributes.http.response.status_code}\s%{INT:attributes.http.response.body.size}\s"-"\s"%{DATA:resource.attributes.user_agent.original}"\s
 ```
-6. Wait until the sample `body.text` on the right shows highlighting, then click `Add processor`
+6. Wait until the sample `body.text` on the right shows highlighting, then click `Create`
 
 ![2_grok.png](../assets/2_grok.png)
 
@@ -48,15 +48,29 @@ We can parse our nginx log messages at ingest-time using the Elastic [Grok](http
 
 The nginx log line includes a timestamp; let's use that as our record timestamp.
 
-1. Click `Add a processor`
-2. Select `Date`
-3. Set `Field` to `timestamp`
+1. Select `Create processor` from the menu `Create`
+2. Select the `Date` Processor
+3. Set `Field` to `attributes.custom.timestamp`
 4. Elastic should auto-recognize the format: `dd/MMM/yyyy:HH:mm:ss XX`
-5. Click `Add processor`
+5. Click `Create`
 
 ![2_date.png](../assets/2_date.png)
 
-Now save the Processing by clicking `Save changes` in the bottom-right.
+## Setting field mappings
+
+1. Click the `Modified fields` tab
+2. Find the field `attributes.http.response.status_code`
+3. Click the ellipse on the far right of the `attributes.http.response.status_code` row
+4. Select `Map field`
+5. Set the type to `Number (long)`
+6. Click `Stage changes` 
+
+## Saving our processors
+
+Now let's save our Processing chain.
+
+1. Click `Save changes` in the bottom-right
+2. Click `Confirm changes` in the resulting dialog
 
 # A faster way to query
 
@@ -66,7 +80,7 @@ Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
 | WHERE http.response.status_code IS NOT NULL
-| KEEP @timestamp, client.ip, http.request.method, http.request.url.path, http.response.status_code, user_agent.original
+| KEEP @timestamp, attributes.client.ip, attributes.http.request.method_original, attributes.url.path, attributes.http.response.status_code, resource.attributes.user_agent.original
 ```
 
 > [!NOTE]
@@ -77,8 +91,8 @@ Let's redraw our status code graph using our newly parsed field:
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
-| WHERE http.response.status_code IS NOT NULL
-| STATS COUNT() BY TO_STRING(http.response.status_code), minute = BUCKET(@timestamp, "1 min")
+| WHERE attributes.http.response.status_code IS NOT NULL
+| STATS COUNT() BY TO_STRING(attributes.http.response.status_code), minute = BUCKET(@timestamp, "1 min")
 ```
 
 Note that this graph, unlike the one we drew before, currently shows only a few minutes of data. That is because it relies upon the fields we parsed in the Processing we just setup. Prior to that time, those fields didn't exist. Change the time field to `Last 5 Minutes` to zoom in on the newly parsed data.
@@ -115,15 +129,15 @@ Remember that simple alert we created? Now that we are parsing these fields at i
 5. Set `Timestamp field` to `@timestamp` (if not already selected)
 6. Set `Good query` to
   ```
-  http.response.status_code < 400
+  attributes.http.response.status_code < 400
   ```
 7. Set `Total query` to
   ```
-  http.response.status_code : *
+  attributes.http.response.status_code : *
   ```
 8. Set `Group by` to
   ```
-  http.request.url.path
+  attributes.url.path
   ```
 
 ![2_slo1.png](../assets/2_slo1.png)

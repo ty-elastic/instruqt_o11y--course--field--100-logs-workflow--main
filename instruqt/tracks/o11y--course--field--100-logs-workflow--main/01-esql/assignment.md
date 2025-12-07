@@ -137,12 +137,16 @@ Some of you may already be familiar with [grok](https://www.elastic.co/docs/expl
 
 If you aren't well versed in grok expressions, or you don't want to spend the time to debug an expression yourself, you can leverage our AI Assistant to help!
 
-1. Click on the AI Assistant button in the upper-right.
-2. Enter the following prompt in the `Send a message to the Assistant` field at the bottom of the fly-out.
+1. Execute the following query:
+  ```esql
+  FROM logs-proxy.otel-default
+  ```
+2. Click on the AI Assistant button in the upper-right.
+3. Enter the following prompt in the `Send a message to the Assistant` field at the bottom of the fly-out.
   ```
   can you write an ES|QL query to parse these nginx log lines?
   ```
-3. Click the execute button
+4. Click the execute button
 
 ![1_ai.png](../assets/1_ai.png)
 

@@ -91,6 +91,7 @@ Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full
 ```
@@ -100,6 +101,7 @@ This is good, but it would also be helpful, based on our experience here, to kno
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
@@ -125,6 +127,7 @@ We built this table by hand; it is far from comprehensive. Now let's use `LOOKUP
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | EVAL user_agent.name_and_vmajor = SUBSTRING(user_agent.full, 0, LOCATE(user_agent.full, ".")-1) // simplify user_agent
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.name_and_vmajor, client.geo.country_iso_code
@@ -144,6 +147,7 @@ Fortunately, Elastic makes it possible to leverage an external Large Language Mo
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
+| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
@@ -231,9 +235,9 @@ Transforms run asynchronously in the background, querying data, aggregating it, 
 4. Select `Pivot` (if not already selected)
 5. Set `Search filter` to
   ```
-  user_agent.full :*
+  user_agent.name :*
   ```
-6. Set `Group by` to `terms(user_agent.full)`
+6. Set `Group by` to `terms(user_agent.name)` and `terms(user_agent.version)`
 7. Add an aggregation for `@timestamp.min`
 8. Click `> Next`
 
@@ -273,10 +277,7 @@ Let's create a new alert which will fire whenever a new User Agent is seen. We s
 6. Change `IS ABOVE` to `IS ABOVE OR EQUALS`
 7. Set `IS ABOVE OR EQUALS` to `1`
 8. Set `FOR THE LAST` to `1 minute`
-9. Set `Group alerts by (optional)` to
-  ```
-  user_agent.full
-  ```
+9. Set `Group alerts by (optional)` to `user_agent.name` and `user_agent.version`
 10. Set `Rule schedule` to `1 seconds`
 
 ![5_alert1.png](../assets/5_alert1.png)

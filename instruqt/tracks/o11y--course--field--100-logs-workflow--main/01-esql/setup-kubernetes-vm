@@ -3,11 +3,12 @@ export $(curl http://kubernetes-vm:9000/env | xargs)
 
 export INSTRUQT_TRACK_SLUG=o11y--course--field--100-logs-workflow--main
 export GITHUB_REPO=https://github.com/ty-elastic/instruqt_o11y--course--field--100-logs-workflow--main
+export BRANCH=9.2
 
 # ------------- CODE
 
 mkdir -p /workspace/workshop
-git clone $GITHUB_REPO /workspace/workshop
+git clone -b $BRANCH $GITHUB_REPO /workspace/workshop
 cd /workspace/workshop
 
 # ------------- VIEW
