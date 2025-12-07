@@ -51,7 +51,7 @@ data:
       pipelines:
         logs:
           receivers: [otlp]
-          processors: [streams_wired, batch]
+          processors: [batch]
           exporters: [elasticsearch/otel]
 ---
 apiVersion: apps/v1
