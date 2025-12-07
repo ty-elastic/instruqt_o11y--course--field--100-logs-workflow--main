@@ -27,11 +27,6 @@ data:
         send_batch_size: 1000
         timeout: 1s
         send_batch_max_size: 1500
-      
-      streams_wired:
-        - context: resource
-          statements:
-            - set(attributes["elasticsearch.index"], "logs")
 
     exporters:
       elasticsearch/otel:
