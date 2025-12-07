@@ -208,9 +208,10 @@ dv=$(curl -X POST "$KIBANA_URL/api/data_views/data_view" \
         "namespaces": [
           "default"
         ],
-        "title": "logs-proxy.otel-default",
+        "title": "logs.proxy",
         "name": "logs-proxy.otel-default",
-        "timeFieldName": "@timestamp"
+        "timeFieldName": "@timestamp",
+        "allowNoIndex": true
       }
     }')
 
