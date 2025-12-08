@@ -44,6 +44,8 @@ We can add the Elastic [GeoIP](https://www.elastic.co/docs/reference/enrich-proc
 7. Click `Save changes` in the bottom-right
 8. Click `Confirm changes` in the resulting dialog
 
+![3_geo.png](../assets/3_geo.png)
+
 ## Setting field mappings
 
 Now we need to map several of our new fields to the proper field type.

@@ -97,6 +97,20 @@ We can further add a Redaction processor to remove `attributes.client.ip` from `
 3. Click on the `Table` tab in the flyout
 4. Note that any presence of the client's ip address in `body.text` has been redacted, yet non-limited viewers will still be able to see client ip explicitly in `attributes.client.ip`
 
+# Limiting retention
+
+Say your records department requires you to keep these logs generally accessible only for a very specific period of time. We can ask Elasticsearch to automatically delete them after some number of days.
+
+1. Open the [button label="Elasticsearch"](tab-0) Instruqt tab
+2. Go to `Streams` using the left-hand navigation pane
+3. Select `logs-proxy.otel-default` from the list of Streams
+4. Click on the `Data retention` tab
+5. Click `Edit data retention`
+6. Select `Set specific retention days`
+7. Set to `30` days
+
+Elasticsearch will now remove this data from its online indices after 30 days. At that time, it will only be available in backups.
+
 # Summary
 
 Let's take stock of what we know:

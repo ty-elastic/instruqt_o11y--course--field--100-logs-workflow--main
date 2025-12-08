@@ -40,8 +40,6 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
   ]
   ```
 6. Click `Create`
-7. Click `Save changes` in the bottom-right
-8. Click `Confirm changes` in the resulting dialog
 
 ![4_ua1.png](../assets/4_ua1.png)
 
@@ -61,6 +59,13 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 12. Select `Map field`
 13. Set the type to `Keyword`
 14. Click `Stage changes`
+
+## Saving our processors
+
+Now let's save our Processing chain.
+
+1. Click `Save changes` in the bottom-right
+2. Click `Confirm changes` in the resulting dialog
 
 ## Analyzing with Discover
 
