@@ -3,7 +3,7 @@ export $(curl http://kubernetes-vm:9000/env | xargs)
 
 export INSTRUQT_TRACK_SLUG=o11y--course--field--100-logs-workflow--main
 export GITHUB_REPO=https://github.com/ty-elastic/instruqt_o11y--course--field--100-logs-workflow--main
-export BRANCH=9.2
+export BRANCH=main
 
 # ------------- CODE
 
