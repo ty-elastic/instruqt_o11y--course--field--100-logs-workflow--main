@@ -182,8 +182,8 @@ Saving an ES|QL query allows others on our team to easily re-run it on demand.
 
 As we are adding panels to our dashboard, we can group them into collapsible sections.
 
-1. Click on `Add panel`
-2. Select `Collapsible Section`
+1. Go to `Dashboards` using the left-hand navigation pane and open `Ingress Status` if it is not already open
+2. Click on `Add` and select `Collapsible Section`
 3. Click on the Pencil icon to the right of the name of the new collapsible section
 4. Name the collapsible section
   ```
@@ -220,7 +220,7 @@ Transforms run asynchronously in the background, querying data, aggregating it, 
 > [!NOTE]
 > Because we are moving quickly, Elasticsearch may take some time to update field lists in the UI. If you encounter a situation where Elasticsearch doesn't recognize one of the fields we just parsed, click the Refresh icon in the upper-right of the Instruqt tab and try again to create the Transform.
 
-1. Go to `Management` > `Stack Management` > `Transforms` using the left-hand navigation pane
+1. Go to `Data management` > `Transforms` using the left-hand navigation pane
 2. Click `Create a transform`
 3. Select `logs-proxy.otel-default` as the data source
 4. Select `Pivot` (if not already selected)

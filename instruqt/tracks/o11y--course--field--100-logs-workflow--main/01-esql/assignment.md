@@ -112,7 +112,7 @@ Let's see if we can find when the errors started occurring. Use the Time Filter 
 
 ![1_time_field.png](../assets/1_time_field.png)
 
-Ok, it looks like this issue first started happening roughly in the last 2 hours. We can use ES|QL's [CHANGE_POINT](https://www.elastic.co/docs/reference/query-languages/esql/commands/processing-commands#esql-change_point) to narrow it down to a specific minute:
+Ok, it looks like this issue first started happening roughly in the last 2 hours. We can use ES|QL's [CHANGE_POINT](https://www.elastic.co/docs/reference/query-languages/esql/commands/change-point) to narrow it down to a specific minute:
 
 Execute the following query:
 ```esql

@@ -92,22 +92,30 @@ We can further add a Redaction processor to remove `attributes.client.ip` from `
 > [!NOTE]
 > This redaction will apply to ALL roles, not just the limited viewer
 
-1. Open the [button label="Elasticsearch"](tab-0) tab
-2. Open the first log record by clicking on the double arrow icon under `Actions`
-3. Click on the `Table` tab in the flyout
-4. Note that any presence of the client's ip address in `body.text` has been redacted, yet non-limited viewers will still be able to see client ip explicitly in `attributes.client.ip`
+Now let's jump back to Discover by clicking `Discover` in the left-hand navigation pane.
+
+Execute the following query:
+```esql
+FROM logs-proxy.otel-default
+```
+
+1. Open the first log record by clicking on the double arrow icon under `Actions`
+2. Click on the `Table` tab in the flyout
+3. Note that any presence of the client's ip address in `body.text` has been redacted as `<client_ip>`, yet non-limited viewers will still be able to see client ip explicitly in the field `attributes.client.ip`
 
 # Limiting retention
 
 Say your records department requires you to keep these logs generally accessible only for a very specific period of time. We can ask Elasticsearch to automatically delete them after some number of days.
 
-1. Open the [button label="Elasticsearch"](tab-0) Instruqt tab
-2. Go to `Streams` using the left-hand navigation pane
-3. Select `logs-proxy.otel-default` from the list of Streams
-4. Click on the `Data retention` tab
-5. Click `Edit data retention`
-6. Select `Set specific retention days`
+1. Navigate to `Streams` using the left-hand navigation pane
+2. Select `logs-proxy.otel-default` from the list of Streams
+3. Click on the `Retention` tab
+4. Click `Edit data retention`
+5. Uncheck `Use the stream’s index template retention configuration`
+6. Select `Custom period`
 7. Set to `30` days
+
+![6_retention.png](../assets/6_retention.png)
 
 Elasticsearch will now remove this data from its online indices after 30 days. At that time, it will only be available in backups.
 

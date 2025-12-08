@@ -30,6 +30,9 @@ We will be working with Elastic [Streams](https://www.elastic.co/docs/solutions/
 We can parse our nginx log messages at ingest-time using the Elastic [Grok](https://www.elastic.co/docs/reference/enrich-processor/grok-processor) processor.
 
 1. Select `Create processor` from the menu `Create your first step`
+
+![2_createprocessor.png](../assets/2_createprocessor.png)
+
 2. Select the `Grok` Processor (if not already selected)
 3. Set the `Field` to
   ```
@@ -62,8 +65,13 @@ The nginx log line includes a timestamp; let's use that as our record timestamp.
 2. Find the field `attributes.http.response.status_code`
 3. Click the ellipse on the far right of the `attributes.http.response.status_code` row
 4. Select `Map field`
+
+![2_modifiedfields.png](../assets/2_modifiedfields.png)
+
 5. Set the type to `Number (long)`
 6. Click `Stage changes`
+
+![2_modifiedfields_save.png](../assets/2_modifiedfields_save.png)
 
 ## Saving our processors
 
@@ -71,6 +79,8 @@ Now let's save our Processing chain.
 
 1. Click `Save changes` in the bottom-right
 2. Click `Confirm changes` in the resulting dialog
+
+![2_savechanges.png](../assets/2_savechanges.png)
 
 # A faster way to query
 
