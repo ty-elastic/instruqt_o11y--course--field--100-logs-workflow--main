@@ -59,6 +59,15 @@ The nginx log line includes a timestamp; let's use that as our record timestamp.
 
 ![2_date.png](../assets/2_date.png)
 
+Finally, now that we've promoted our log timestamp to be that of the record timestamp, we can delete `attributes.custom.timestamp` to save disk space:
+
+1. Select `Create processor` from the menu `Create`
+2. Select the `Remove` Processor
+3. Set `Source Field` to `attributes.custom.timestamp`
+4. Click `Create`
+
+![2_remove.png](../assets/2_remove.png)
+
 ## Saving our processors
 
 Now let's save our Processing chain.
