@@ -110,9 +110,11 @@ Saving an ES|QL query allows others on our team to easily re-run it on demand.
 
 The CIO is concerned about us not testing new browsers sufficiently, and for some time wants a nightly report of our dashboard. No problem!
 
-1. Click on `Export` icon
-2. Select `Schedule exports`
-3. Click `Schedule exports` at the bottom-right of the resulting fly-out
+1. Click `Dashboards` in the left-hand navigation pane
+2. Open the `Ingress Status` dashboard (if not already open)
+3. Click on `Export` icon
+4. Select `Schedule exports`
+5. Click `Schedule exports` at the bottom-right of the resulting fly-out
 
 ![5_exports.png](../assets/5_exports.png)
 
