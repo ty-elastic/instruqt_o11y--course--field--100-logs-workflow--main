@@ -11,7 +11,7 @@ developers:
 show_timer: true
 idle_timeout: 21600
 timelimit: 43200
-sandbox_preset: managed-elastic-9-3-0-fe116a51
+sandbox_preset: managed-elastic-9-3-0
 lab_config:
   extend_ttl: 3600
   sidebar_enabled: true
@@ -23,5 +23,5 @@ lab_config:
     name: modern-dark
   override_challenge_layout: false
   hideStopButton: false
-checksum: "2083726491409699454"
+checksum: "4794280564473532881"
 enhanced_loading: false

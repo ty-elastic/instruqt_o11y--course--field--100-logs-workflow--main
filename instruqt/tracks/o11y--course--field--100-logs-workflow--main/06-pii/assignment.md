@@ -60,9 +60,9 @@ Now let's ensure our limited user has access to a redacted `body.text`.
 4. Open the first log record by clicking on the double arrow icon under `Actions`
 5. Note that `attributes.client.ip` is not accessible, but `body.text` is
 
-## Redaction
+# Redaction
 
-We can further add a Redaction processor to remove `attributes.client.ip` from `body.text`:
+While we've removed access to the `attributes.client.ip` field for the limited viewer, the client's IP address is still visible in `body.text`. Fortunately, Elasticsearch has a processor easily and automatically redact such PII information.
 
 1. Open the [button label="Elasticsearch"](tab-0) tab
 2. Go to `Streams` using the left-hand navigation pane

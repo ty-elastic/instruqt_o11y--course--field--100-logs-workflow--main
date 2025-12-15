@@ -20,44 +20,9 @@ enhanced_loading: false
 ---
 Now that we know what happened, let's try to be sure this never happens again by building out more reporting and alerting.
 
-# Generating a breakdown of user agents
-
-As long as we are parsing our User Agent string, let's build some visualizations of the makeup of our browser clients. We can accomplish this using our parsed User Agent string and ES|QL.
-
-## Breakdown by Browser
-
-Let's create a chart depicting the overall breakdown of browsers.
-
-Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
-
-Execute the following query:
-```esql
-FROM logs-proxy.otel-default
-| WHERE user_agent.name IS NOT NULL
-| STATS COUNT() by user_agent.name
-```
-
-1. Click on the pencil icon to the right of the existing graph
-2. Select `Pie` from the visualizations drop-down menu
-3. Click `Apply and close`
-
-## Adding our visualization to a dashboard
-
-Let's save it to our dashboard for future use.
-
-1. Click on the Disk icon in the upper-right of the resulting graph
-2. Name the visualization
-  ```
-  Client Browsers
-  ```
-3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
-5. Click `Save and go to Dashboard`
-6. Once the dashboard has loaded, click the `Save` button in the upper-right
-
 # Generating a table of user agents
 
-It would also be helpful is to keep track of new User Agents as they appear in the wild.
+Let's keep track of new User Agents as they appear in the wild.
 
 Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
 
@@ -152,7 +117,7 @@ The CIO is concerned about us not testing new browsers sufficiently, and for som
 ![5_exports.png](../assets/5_exports.png)
 
 > [!NOTE]
-> In practice, you would setup an email Connector to allow Elasticsearch to automatically email the report to the CIO on the schedule you defined.
+> In practice, you would setup an email Connector to allow Elasticsearch to automatically email the dashboard to the CIO on the schedule you defined.
 
 # Alert when a new UA is seen
 

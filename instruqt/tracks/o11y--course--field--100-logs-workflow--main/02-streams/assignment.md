@@ -59,20 +59,6 @@ The nginx log line includes a timestamp; let's use that as our record timestamp.
 
 ![2_date.png](../assets/2_date.png)
 
-## Setting field mappings
-
-1. Click the `Detected fields` tab
-2. Find the field `attributes.http.response.status_code`
-3. Click the ellipse on the far right of the `attributes.http.response.status_code` row
-4. Select `Map field`
-
-![2_modifiedfields.png](../assets/2_modifiedfields.png)
-
-5. Set the type to `Number (long)`
-6. Click `Stage changes`
-
-![2_modifiedfields_save.png](../assets/2_modifiedfields_save.png)
-
 ## Saving our processors
 
 Now let's save our Processing chain.
