@@ -61,7 +61,7 @@ The nginx log line includes a timestamp; let's use that as our record timestamp.
 
 ## Setting field mappings
 
-1. Click the `Modified fields` tab
+1. Click the `Detected fields` tab
 2. Find the field `attributes.http.response.status_code`
 3. Click the ellipse on the far right of the `attributes.http.response.status_code` row
 4. Select `Map field`
@@ -119,7 +119,7 @@ This is a useful graph! Let's save it to our dashboard for future use.
 3. Select `New` under `Add to dashboard`
 4. Click `Save and go to Dashboard`
 
-![1_dashboard.png](../assets/1_dashboard.png)
+![1_dashboard.png](../assets/2_dashboard.png)
 
 You will be taken to a new dashboard. Let's save it for future reference.
 
@@ -137,7 +137,7 @@ You will be taken to a new dashboard. Let's save it for future reference.
 
 ![2_reload.png](../assets/2_reload.png)
 
-Remember that simple alert we created? Now that we are parsing these fields at ingest-time, we can create a proper SLO instead of a simple binary alert. With a SLO, we can allow for some percentage of errors over time (common in a complex system) before we get our support staff out of bed.
+Now that we are parsing out specific fields at ingest-time, we can create a SLO to monitor HTTP status over time. With a SLO, we can allow for some percentage of errors over time (common in a complex system) before we get our support staff out of bed.
 
 1. Click `SLOs` in the left-hand navigation pane
 2. Click `Create SLO`
@@ -207,12 +207,13 @@ Now let's add the SLO monitor to our dashboard to help us find it in the future.
 
 1. Click `Dashboards` in the left-hand navigation pane
 2. Open the `Ingress Status` dashboard (if not already open)
-3. Click `Add panel`
-4. Select `SLO Overview`
-5. Select `Grouped SLOs`
-6. Set `Group by` to `Tags`
-7. Set `Tags` to `ingress`
-8. Click `Save`
+3. Click the `Add` button in the upper-right
+4. Select `New panel` from the dropdown menu
+5. Select `SLO Overview`
+6. Select `Grouped SLOs`
+7. Set `Group by` to `Tags`
+8. Set `Tags` to `ingress`
+9. Click `Save`
 
 ![2_slo3.png](../assets/2_slo3.png)
 
@@ -222,15 +223,33 @@ Note that we are dynamically adding SLOs by tag. Any additional SLOs tagged with
 
 Let's also add our growing list of alerts to our dashboard.
 
-1. Click `Add panel`
-2. Select `Alerts`
-4. Set `Filter by` to `Rule tags`
-5. Set `Rule tags` to `ingress`
-6. Click `Save`
+1. Click the `Add` button in the upper-right
+2. Select `New panel` from the dropdown menu
+3. Select `Alerts`
+4. Set `Solution` to `Observability`
+5. Set `Filter by` to `Rule tags`
+6. Set `Rule tags` to `ingress`
+7. Click `Save`
 
 Note that we are dynamically adding alerts by tag. Any additional alerts tagged with `ingress` will also appear here.
 
 Now save the changes to our dashboard by clicking the `Save` button in the upper-right.
+
+## Organizing our dashboard
+
+As we are adding panels to our dashboard, we can group them into collapsible sections.
+
+1. Click the `Add` button in the upper-right
+2. Select `Collapsible Section` from the dropdown menu
+3. Click on the Pencil icon to the right of the name of the new collapsible section
+4. Name the collapsible section
+  ```
+  Alerts
+  ```
+5. Click the green check box next to the name of the collapsible section
+6. Open the collapsible section (if it isn't already) by clicking on the open/close arrow to the left of the collapsible section name
+7. Drag `SLO Overview` and the Alerts panel we just setup into the body below the `Alerts` collapsible section
+8. Click `Save` to save the dashboard
 
 # Summary
 
