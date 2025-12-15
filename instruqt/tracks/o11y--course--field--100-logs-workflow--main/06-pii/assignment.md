@@ -58,7 +58,7 @@ Now let's ensure our limited user has access to a redacted `body.text`.
 2. Close the open log record flyout
 3. Run the search query again
 4. Open the first log record by clicking on the double arrow icon under `Actions`
-5. Note that `attributes.client.ip` is not accessible, but `body.text` is (in redacted form)
+5. Note that `attributes.client.ip` is not accessible, but `body.text` is
 
 ## Redaction
 
@@ -103,22 +103,6 @@ FROM logs-proxy.otel-default
 2. Click on the `Table` tab in the flyout
 3. Note that any presence of the client's ip address in `body.text` has been redacted as `<client_ip>`, yet non-limited viewers will still be able to see client ip explicitly in the field `attributes.client.ip`
 
-# Limiting retention
-
-Say your records department requires you to keep these logs generally accessible only for a very specific period of time. We can ask Elasticsearch to automatically delete them after some number of days.
-
-1. Navigate to `Streams` using the left-hand navigation pane
-2. Select `logs-proxy.otel-default` from the list of Streams
-3. Click on the `Retention` tab
-4. Click `Edit data retention`
-5. Uncheck `Use the stream’s index template retention configuration`
-6. Select `Custom period`
-7. Set to `30` days
-
-![6_retention.png](../assets/6_retention.png)
-
-Elasticsearch will now remove this data from its online indices after 30 days. At that time, it will only be available in backups.
-
 # Summary
 
 Let's take stock of what we know:
@@ -132,14 +116,15 @@ Let's take stock of what we know:
 
 And what we've done:
 
-* Created a dashboard to monitor our ingress proxy
-* Created graphs to monitor status codes over time
-* Created a simple alert to let us know if we ever return non-200 error codes
+* Created several graphs to help quantify the extent of the problem
 * Parsed the logs at ingest-time for quicker and more powerful analysis
+* Created a dashboard to monitor our ingress proxy
 * Create a SLO (with alert) to let us know if we ever return a significant number of non-200 error codes over time
+* Geocoded client IP to associate location information with clients
 * Created visualizations to help us visually locate clients and errors
-* Created graphs in our dashboard showing the breakdown of User Agents
-* Created a table in our dashboard iterating seen User Agents
+* Parsed the user agent string to associate browser information with clients
+* Determined, using client location and browser information, the root cause of our problem
+* Created a table in our dashboard iterating User Agents in the wild
 * Created a nightly report to snapshot our dashboard
 * Created an alert to let us know when a new User Agent string appears
 * Setup RBAC to restrict access to `client.ip`
@@ -153,15 +138,13 @@ Over the course of this lab, we learned about:
 * Using ES|QL to parse logs at query-time
 * Using ES|QL to do advanced aggregations, analytics, and visualizations
 * Creating a dashboard
-* Using ES|QL to create Alerts
 * Using AI Assistant to help write ES|QL queries
 * Using Streams to setup ingest-time log processing pipeline (GROK parsing, geo-location, User Agent parsing)
-* Setting up SLOs
+* Setting up SLOs and alerts
 * Using Maps to visualize geographic information
 * Scheduling dashboard reports
 * Setting up a Pivot Transform and Alert
 * Setting up RBAC
-* Setting up data retention
 
 We put these technologies to use in a practical workflow which quickly took us from an unknown problem to a definitive Root Cause. Furthermore, we've setup alerts to ensure we aren't caught off-guard in the future. Finally, we built a really nice custom dashboard to help us monitor the health of our Ingress Status.
 

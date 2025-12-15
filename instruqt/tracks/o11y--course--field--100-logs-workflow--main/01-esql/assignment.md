@@ -85,7 +85,7 @@ Let's visualize this as a pie graph to make it a little easier to understand.
 2. Select `Pie` from the visualizations drop-down menu
 3. Click `Apply and close`
 
-This error appears to only be affecting a percentage of our overall requests. We don't yet have the tools to break this down by customer or client, but we will in a future exercise.
+This error appears to only be affecting a percentage of our overall requests. We don't yet have the tools to break this down further, but we will in a future exercise.
 
 # Are the errors still occurring?
 
@@ -151,47 +151,7 @@ If you aren't well versed in grok expressions, or you don't want to spend the ti
 ![1_ai.png](../assets/1_ai.png)
 
 > [!NOTE]
-> The output should look something like the following. Notably, the AI Assistant may generate slightly different field names on each generating. Because we rely on those field names in subsequent analysis, please close the flyout and copy and paste the following ES|QL expression into the ES|QL query entry box.
-
-```esql
-FROM logs-proxy.otel-default
-| GROK body.text "%{IPORHOST:client_ip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"%{WORD:http_method} %{NOTSPACE:request_path} HTTP/%{NUMBER:http_version}\" %{NUMBER:status_code} %{NUMBER:body_bytes_sent:int} \"%{DATA:referrer}\" \"%{DATA:user_agent}\"" // parse access log
-| WHERE status_code IS NOT NULL
-| EVAL @timestamp = DATE_PARSE("dd/MMM/yyyy:HH:mm:ss Z", timestamp) // use embedded timestamp as record timestamp
-| KEEP @timestamp, client_ip, http_method, request_path, status_code, user_agent
-```
-
-# Is this affecting several or just one backend API?
-
-Let's make use of these parsed fields to break down `status_code` by `request_path` to see if this is affecting only a specific API, or several APIs?
-
-Execute the following query:
-```esql
-FROM logs-proxy.otel-default
-| GROK body.text "%{IPORHOST:client_ip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"%{WORD:http_method} %{NOTSPACE:request_path} HTTP/%{NUMBER:http_version}\" %{NUMBER:status_code} %{NUMBER:body_bytes_sent:int} \"%{DATA:referrer}\" \"%{DATA:user_agent}\""
-| WHERE status_code IS NOT NULL
-| STATS COUNT() BY status_code, request_path
-```
-
-Ok, it seems these errors are affecting all of the APIs (2) exposed by our simple backend.
-
-> [!NOTE]
-> You may notice that our search has gotten a little slower when we added query-time grok parsing. This is because Elasticsearch is now applying our grok pattern to _every_ log line in the selected time window. In our next challenge, we will show you how we can retain fast-search over long time windows WITH parsing using ingest-time parsing!
-
-# Is this affecting all User Agents?
-
-Our nginx access logs also include a [User Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent) field, which is a semi-structured field containing some information about the requesting browser. Ideally, we could also cross-reference the errors against this field to understand if it is affecting all browsers, or only some types of browsers.
-
-Execute the following query:
-```esql
-FROM logs-proxy.otel-default
-| GROK body.text "%{IPORHOST:client_ip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"%{WORD:http_method} %{NOTSPACE:request_path} HTTP/%{NUMBER:http_version}\" %{NUMBER:status_code} %{NUMBER:body_bytes_sent:int} \"%{DATA:referrer}\" \"%{DATA:user_agent}\""
-| WHERE status_code IS NOT NULL
-| WHERE TO_INT(status_code) == 500
-| STATS bad = COUNT() BY user_agent
-```
-
-Unfortunately, the unparsed `user_agent` field is too unstructured to really be useful for this kind of analysis. We could try to write a grok expression to further parse `user_agent`, but in practice, it is too complicated (it requires translations and lookups in addition to parsing). Let's put a pin in this topic and revisit it in a bit when we have more tools at our disposal.
+> The output should look something like the following. Notably, the AI Assistant may generate slightly different field names on each generating. Because we rely on those field names in subsequent analysis, please close the flyout box and use the provided ES|QL expressions in the following exercises.
 
 # Making use of our parsed fields
 
@@ -211,66 +171,23 @@ FROM logs-proxy.otel-default
 
 Now that we are graphing by `status_code`, we know definitively that we returning only 200 and 500 status codes.
 
-## Saving our visualization to a dashboard
+> [!NOTE]
+> You may notice that our search has gotten a little slower when we added query-time grok parsing. This is because Elasticsearch is now applying our grok pattern to _every_ log line in the selected time window. In our next challenge, we will show you how we can retain fast-search over long time windows WITH parsing using ingest-time parsing!
 
-Let's save this graph to a dashboard for future use.
+# Is this affecting all User Agents?
 
-![1_save.png](../assets/1_save.png)
-
-1. Click on the Disk icon in the upper-right of the resulting graph
-2. Name the visualization
-  ```
-  Status Code Over Time (ESQL)
-  ```
-3. Select `New` under `Add to dashboard`
-4. Click `Save and go to Dashboard`
-
-![1_dashboard.png](../assets/1_dashboard.png)
-
-You will be taken to a new dashboard. Let's save it for future reference.
-
-1. Click the `Save` button in the upper-right
-2. Enter the title of the new dashboard as
-  ```
-  Ingress Status
-  ```
-3. Click `Save`
-
-# Setting up a simple alert
-
-Go back to `Discover` using the left-hand navigation pane.
-
-Let's create a simple alert to notify us whenever a `status_code` >= 400 is received:
+Our nginx access logs also include a [User Agent](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/User-Agent) field, which is a semi-structured field containing some information about the requesting browser. Ideally, we could also cross-reference the errors against this field to understand if it is affecting all browsers, or only some types of browsers.
 
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
-| GROK body.text "%{IPORHOST:client_ip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"%{WORD:http_method} %{NOTSPACE:request_path} HTTP/%{NUMBER:http_version}\" %{NUMBER:status_code:int} %{NUMBER:body_bytes_sent:int} \"%{DATA:referrer}\" \"%{DATA:user_agent}\""
-| WHERE status_code >= 400
+| GROK body.text "%{IPORHOST:client_ip} %{USER:ident} %{USER:auth} \\[%{HTTPDATE:timestamp}\\] \"%{WORD:http_method} %{NOTSPACE:request_path} HTTP/%{NUMBER:http_version}\" %{NUMBER:status_code} %{NUMBER:body_bytes_sent:int} \"%{DATA:referrer}\" \"%{DATA:user_agent}\""
+| WHERE status_code IS NOT NULL
+| WHERE TO_INT(status_code) == 500
+| STATS bad = COUNT() BY user_agent
 ```
 
-![1_alert.png](../assets/1_alert.png)
-
-1. Click `Alerts` in the taskbar
-2. Select `Create search threshold rule`
-3. Click `Test query`
-4. Leave the defaults and click `Next`
-5. Click `Next` on `Actions` tab
-6. Set `Rule name` to
-  ```
-  status_code >= 400
-  ```
-7. Set `Tags` to
-  ```
-  ingress
-  ```
-8. Click `Create rule` on `Details` tab
-9. Click `Save rule` on the pop-up dialog
-
-In practice, this alert is too simple. We probably are okay with a small percentage of non-200 errors for any large scale infrastructure. What we really want is to alert when we violate a SLO. We will revisit this topic in a bit.
-
-> [!NOTE]
-> For the purposes of this workshop, we aren't setting up any Connectors to take action on our alerts. Typically, you would configure one or more [Actions](https://www.elastic.co/docs/explore-analyze/alerts-cases/alerts#rules-actions) when creating an Alert.
+Unfortunately, the unparsed `user_agent` field is too unstructured to really be useful for this kind of analysis. We could try to write a grok expression to further parse `user_agent`, but in practice, it is too complicated (it requires translations and lookups in addition to parsing). Thankfully, Elastic provides tools to parse User Agent as you will see in an upcoming exercise.
 
 # Summary
 
@@ -278,12 +195,7 @@ Let's take stock of what we know:
 
 * a percentage of requests are experiencing 500 errors
 * the errors started occurring around 80 minutes ago
-* the only error type seen is 500
-* the errors occur over all APIs
 
 And what we've done:
 
-* Created a dashboard to monitor our ingress proxy
-* Created graphs to monitor status codes over time
-* Created a simple alert to let us know if we ever return non-200 error codes
-
+* Created several graphs to help quantify the extent of the problem

@@ -115,15 +115,16 @@ Let's take stock of what we know:
 * a small percentage of requests are experiencing 500 errors
 * the errors started occurring around 80 minutes ago
 * the only error type seen is 500
-* the errors occur over all APIs
 * the errors occur only in the `TH` region
 * the errors occur only with browsers based on Chrome v136
 
 And what we've done:
 
-* Created a dashboard to monitor our ingress proxy
-* Created graphs to monitor status codes over time
-* Created a simple alert to let us know if we ever return non-200 error codes
+* Created several graphs to help quantify the extent of the problem
 * Parsed the logs at ingest-time for quicker and more powerful analysis
+* Created a dashboard to monitor our ingress proxy
 * Create a SLO (with alert) to let us know if we ever return a significant number of non-200 error codes over time
+* Geocoded client IP to associate location information with clients
 * Created visualizations to help us visually locate clients and errors
+* Parsed the user agent string to associate browser information with clients
+* Determined, using client location and browser information, the root cause of our problem

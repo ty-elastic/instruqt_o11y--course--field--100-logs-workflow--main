@@ -114,14 +114,21 @@ This is a useful graph! Let's save it to our dashboard for future use.
 1. Click on the Disk icon in the upper-right of the resulting graph
 2. Name the visualization
   ```
-  Status Code Over Time (Streams)
+  Status Code Over Time
   ```
-3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
-5. Click `Save and go to Dashboard`
-6. Once the dashboard has loaded, click the `Save` button in the upper-right
+3. Select `New` under `Add to dashboard`
+4. Click `Save and go to Dashboard`
 
-![2_dashboard.png](../assets/2_dashboard.png)
+![1_dashboard.png](../assets/1_dashboard.png)
+
+You will be taken to a new dashboard. Let's save it for future reference.
+
+1. Click the `Save` button in the upper-right
+2. Enter the title of the new dashboard as
+  ```
+  Ingress Status
+  ```
+3. Click `Save`
 
 # Creating a SLO
 
@@ -232,12 +239,10 @@ Let's take stock of what we know:
 * a small percentage of requests are experiencing 500 errors
 * the errors started occurring around 80 minutes ago
 * the only error type seen is 500
-* the errors occur over all APIs
 
 And what we've done:
 
-* Created a dashboard to monitor our ingress proxy
-* Created graphs to monitor status codes over time
-* Created a simple alert to let us know if we ever return non-200 error codes
+* Created several graphs to help quantify the extent of the problem
 * Parsed the logs at ingest-time for quicker and more powerful analysis
+* Created a dashboard to monitor our ingress proxy
 * Create a SLO (with alert) to let us know if we ever return a significant number of non-200 error codes over time

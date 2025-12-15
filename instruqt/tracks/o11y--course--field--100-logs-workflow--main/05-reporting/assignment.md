@@ -24,36 +24,9 @@ Now that we know what happened, let's try to be sure this never happens again by
 
 As long as we are parsing our User Agent string, let's build some visualizations of the makeup of our browser clients. We can accomplish this using our parsed User Agent string and ES|QL.
 
-## Breakdown by OS
-
-Execute the following query:
-```esql
-FROM logs-proxy.otel-default
-| WHERE user_agent.os.name IS NOT NULL
-| STATS COUNT() by user_agent.os.name, user_agent.os.version
-```
-
-1. Click on the pencil icon to the right of the existing graph
-2. Select `Treemap` from the visualizations drop-down menu
-3. Click `Apply and close`
-
-## Saving our visualization to a dashboard
-
-Let's save it to our dashboard for future use.
-
-1. Click on the Disk icon in the upper-right of the resulting graph
-2. Name the visualization
-  ```
-  Client OSs
-  ```
-3. Select `Existing` under `Add to dashboard`
-4. Select the existing dashboard `Ingress Status` (you will need to start typing `Ingress` in the `Search dashboards...` field)
-5. Click `Save and go to Dashboard`
-6. Once the dashboard has loaded, click the `Save` button in the upper-right
-
 ## Breakdown by Browser
 
-Let's also create a chart depicting the overall breakdown of browsers.
+Let's create a chart depicting the overall breakdown of browsers.
 
 Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
 
@@ -87,16 +60,6 @@ Let's save it to our dashboard for future use.
 It would also be helpful is to keep track of new User Agents as they appear in the wild.
 
 Jump back to Discover by clicking `Discover` in the left-hand navigation pane.
-
-Execute the following query:
-```esql
-FROM logs-proxy.otel-default
-| EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
-| WHERE user_agent.full IS NOT NULL
-| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full
-```
-
-This is good, but it would also be helpful, based on our experience here, to know the first country that a given User Agent appeared in.
 
 Execute the following query:
 ```esql
@@ -177,24 +140,6 @@ Let's save this search for future reference:
 3. Click `Save`
 
 Saving an ES|QL query allows others on our team to easily re-run it on demand.
-
-# Organizing our dashboard
-
-As we are adding panels to our dashboard, we can group them into collapsible sections.
-
-1. Go to `Dashboards` using the left-hand navigation pane and open `Ingress Status` if it is not already open
-2. Click on `Add` and select `Collapsible Section`
-3. Click on the Pencil icon to the right of the name of the new collapsible section
-4. Name the collapsible section
-  ```
-  User Agent
-  ```
-5. Click the green check box next to the name of the collapsible section
-6. Open the collapsible section (if it isn't already) by clicking on the open/close arrow to the left of the collapsible section name
-7. Drag the `Client Browsers` pie chart, and the `Client OSs` treemap into the body below the `User Agent` collapsible section
-8. Click `Save` to save the dashboard
-
-Feel free to create additional collapsible sections to group and organize other visualizations on our dashboard.
 
 # Scheduling a report
 
@@ -313,19 +258,19 @@ Let's take stock of what we know:
 * a small percentage of requests are experiencing 500 errors
 * the errors started occurring around 80 minutes ago
 * the only error type seen is 500
-* the errors occur over all APIs
 * the errors occur only in the `TH` region
 * the errors occur only with browsers based on Chrome v136
 
 And what we've done:
 
-* Created a dashboard to monitor our ingress proxy
-* Created graphs to monitor status codes over time
-* Created a simple alert to let us know if we ever return non-200 error codes
+* Created several graphs to help quantify the extent of the problem
 * Parsed the logs at ingest-time for quicker and more powerful analysis
+* Created a dashboard to monitor our ingress proxy
 * Create a SLO (with alert) to let us know if we ever return a significant number of non-200 error codes over time
+* Geocoded client IP to associate location information with clients
 * Created visualizations to help us visually locate clients and errors
-* Created graphs in our dashboard showing the breakdown of User Agents
-* Created a table in our dashboard iterating seen User Agents
+* Parsed the user agent string to associate browser information with clients
+* Determined, using client location and browser information, the root cause of our problem
+* Created a table in our dashboard iterating User Agents in the wild
 * Created a nightly report to snapshot our dashboard
 * Created an alert to let us know when a new User Agent string appears
