@@ -39,6 +39,29 @@ FROM logs-proxy.otel-default
 
 Fabulous! Now we can see every User Agent we encounter, when we first encountered it, and in what region it was first seen.
 
+Let's save this search for future reference:
+
+1. Click the `Save` button in the upper-right
+2. Set `Title` to
+  ```
+  user_agents
+  ```
+3. Click `Save`
+
+Saving an ES|QL query allows others on our team to easily re-run it on demand, and let's us add it to a dashboard.
+
+## Adding a Saved Search to a dashboard
+
+Let's add this table to our dashboard:
+
+1. Click `Dashboards` in the left-hand navigation pane
+2. Open the `Ingress Status` dashboard (if not already open)
+3. Click the `Add` button in the upper-right
+4. Select `From library` from the dropdown menu
+5. Search from and select `user_agents`
+6. Close the flyout
+7. Click `Save`
+
 ## Using LOOKUP JOIN to determine release date
 
 Say you also wanted to know when a given User Agent was released to the wild by the developer?
@@ -94,17 +117,6 @@ FROM logs-proxy.otel-default
 > If this encounters a timeout, try executing the query again.
 
 You'll note that we are limiting our results to only the top 10 last seen User Agents. This is intentional to limit the number of `COMPLETION` commands executed, as each one will result in a call to our configured external Large Language Model (LLM). Notably, the use of the `COMPLETION` command is in Tech Preview; future revisions of ES|QL may include a means to more practically scale the use of the `COMPLETION` command.
-
-Let's save this search for future reference:
-
-1. Click the `Save` button in the upper-right
-2. Set `Title` to
-  ```
-  ua_release_dates
-  ```
-3. Click `Save`
-
-Saving an ES|QL query allows others on our team to easily re-run it on demand.
 
 # Scheduling a report
 
