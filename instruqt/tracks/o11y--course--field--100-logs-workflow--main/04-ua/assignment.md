@@ -54,6 +54,9 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 7. Set the type to `Keyword`
 8. Click `Stage changes`
 
+> [!NOTE]
+> Make sure you are mapping `user_agent.name` and `user_agent.version` and not `user_agent.os.name` and `user_agent.os.version`
+
 ## Saving our processors
 
 Now let's save our Processing chain.

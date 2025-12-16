@@ -62,6 +62,9 @@ Now we need to map several of our new fields to the proper field type.
 
 ![3_mappings.png](../assets/3_mappings.png)
 
+> [!NOTE]
+> Take care to map `client.geo.country_iso_code`. It is easy to map `client.geo.region_iso_code` by mistake.
+
 ## Analyzing with Discover
 
 Jump back to Discover by clicking `Discover` in the left-hand navigation pane.

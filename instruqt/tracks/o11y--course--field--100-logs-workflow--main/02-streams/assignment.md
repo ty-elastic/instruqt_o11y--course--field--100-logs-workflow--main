@@ -45,6 +45,9 @@ We can parse our nginx log messages at ingest-time using the Elastic [Grok](http
 ```
 6. Wait until the sample `body.text` on the right shows highlighting, then click `Create`
 
+> [!NOTE]
+> You may receive an error indicating `attributes.custom.timestamp` is malformed. This is expected and will be addressed in the next step which conforms the timestamp to Elasticsearch's format.
+
 ![2_grok.png](../assets/2_grok.png)
 
 ## Parsing the timestamp
@@ -67,6 +70,9 @@ Finally, now that we've promoted our log timestamp to be that of the record time
 4. Click `Create`
 
 ![2_remove.png](../assets/2_remove.png)
+
+> [!NOTE]
+> `attributes.custom.timestamp` won't be available in the dropdown of available fields, but you can still enter the value.
 
 ## Saving our processors
 

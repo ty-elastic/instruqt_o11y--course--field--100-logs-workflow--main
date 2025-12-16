@@ -91,6 +91,10 @@ FROM logs-proxy.otel-default
 
 We can quickly see the problem with maintaining our own `ua_lookup` index. It would take a lot of work to truly track the release date of every Browser version in the wild.
 
+Notably, you can edit the `ua_lookup` table directly from Discover! Hover over `ua_lookup` next to `LOOKUP JOIN` and select `Edit lookup index`!
+
+![5_lookupjoin.png](../assets/5_lookupjoin.png)
+
 ## Using COMPLETION to determine release date
 
 Fortunately, Elastic makes it possible to leverage an external Large Language Model (LLM) as part of an ES|QL query using the [COMPLETION](https://www.elastic.co/docs/reference/query-languages/esql/commands/processing-commands#esql-completion) command. In this case, we can pipe each browser to the LLM and ask it to return the release date.
