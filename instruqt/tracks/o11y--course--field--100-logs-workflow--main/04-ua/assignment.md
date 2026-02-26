@@ -95,10 +95,10 @@ So what's the correlation with the geographic area we previously identified as b
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
-| WHERE client.geo.country_iso_code IS NOT NULL AND user_agent.version IS NOT NULL AND http.response.status_code IS NOT NULL
+| WHERE attributes.client.geo.country_iso_code IS NOT NULL AND user_agent.version IS NOT NULL AND http.response.status_code IS NOT NULL
 | EVAL version_major = SUBSTRING(user_agent.version,0,LOCATE(user_agent.version, ".")-1)
 | WHERE user_agent.name LIKE "*Chrome*" AND TO_INT(version_major) == 136
-| STATS COUNT() BY client.geo.country_iso_code
+| STATS COUNT() BY attributes.client.geo.country_iso_code
 ```
 
 A-ha! It appears that this specific version of the Chrome browser (v136) has only been seen in the `TH` region! Quite possibly, Google has rolled out a specialized or canary version of their browser first in the `TH` region. That would explain why we saw errors only in the `TH` region.

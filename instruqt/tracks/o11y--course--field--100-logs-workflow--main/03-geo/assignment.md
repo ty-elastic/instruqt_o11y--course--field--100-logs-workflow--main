@@ -34,7 +34,7 @@ We can add the Elastic [GeoIP](https://www.elastic.co/docs/reference/enrich-proc
     {
       "geoip": {
         "field": "attributes.client.ip",
-        "target_field": "client.geo",
+        "target_field": "attributes.client.geo",
         "ignore_missing": true
       }
     }
@@ -52,18 +52,19 @@ Now we need to map several of our new fields to the proper field type.
 
 1. Select the `Schema` tab
 2. Search for field `client.geo`
-3. Click on the ellipse on the right-hand side of the `client.geo.location.lat` row and select `Map as geo field`
-4. Click `Stage changes` in the resulting dialog
-5. Click on the ellipse on the right-hand side of the `client.geo.country_iso_code` row and select `Map field`
-6. Set `Type` to `Keyword`
-7. Click `Stage changes` in the resulting dialog
-8. Click `Submit changes` in the bottom-right
-9. Click `Confirm changes` in the resulting dialog
+3. Click on the ellipse on the right-hand side of the `attributes.client.geo.location` row and select `Map field`
+4. Set `Type` to `Geo point`
+5. Click `Stage changes`
+6. Click on the ellipse on the right-hand side of the `attributes.client.geo.country_iso_code` row and select `Map field`
+7. Set `Type` to `Keyword`
+8. Click `Stage changes` in the resulting dialog
+9. Click `Submit changes` in the bottom-right
+10. Click `Confirm changes` in the resulting dialog
 
 ![3_mappings.png](../assets/3_mappings.png)
 
 > [!NOTE]
-> Take care to map `client.geo.country_iso_code`. It is easy to map `client.geo.region_iso_code` by mistake.
+> Take care to map `attributes.client.geo.country_iso_code`. It is easy to map `attributes.client.geo.region_iso_code` by mistake.
 
 ## Analyzing with Discover
 
@@ -74,8 +75,8 @@ Adjust the time field to show the last 3 hours of data.
 Execute the following query:
 ```esql
 FROM logs-proxy.otel-default
-| WHERE client.geo.country_iso_code IS NOT NULL AND attributes.http.response.status_code IS NOT NULL
-| STATS COUNT() BY attributes.http.response.status_code, client.geo.country_iso_code
+| WHERE attributes.client.geo.country_iso_code IS NOT NULL AND attributes.http.response.status_code IS NOT NULL
+| STATS COUNT() BY attributes.http.response.status_code, attributes.client.geo.country_iso_code
 | SORT attributes.http.response.status_code DESC
 ```
 
@@ -123,7 +124,7 @@ Now let's visualize client access by location and status code:
 2. Click the `Elasticsearch` tab under `Add layer`
 3. Select `Documents`
 4. Select `Data view` to `logs-proxy.otel-default`
-5. Set `Geospatial field` to `client.geo.location` (if this field isn't available, refresh the Instruqt virtual browser tab)
+5. Set `Geospatial field` to `attributes.client.geo.location` (if this field isn't available, refresh the Instruqt virtual browser tab)
 6. Click `Add and continue`
 7. Scroll down to `Layer style`
 8. Set `Fill color` to `By value`

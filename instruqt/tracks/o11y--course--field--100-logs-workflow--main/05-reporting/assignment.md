@@ -31,9 +31,9 @@ Execute the following query:
 FROM logs-proxy.otel-default
 | EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
-| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
+| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, attributes.client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
-| STATS first_country_iso_code = TOP(client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.full // select first and last seen values
+| STATS first_country_iso_code = TOP(attributes.client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.full // select first and last seen values
 | SORT user_agent.full, first_seen, last_seen, first_country_iso_code
 ```
 
@@ -81,9 +81,9 @@ FROM logs-proxy.otel-default
 | EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
 | EVAL user_agent.name_and_vmajor = SUBSTRING(user_agent.full, 0, LOCATE(user_agent.full, ".")-1) // simplify user_agent
-| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.name_and_vmajor, client.geo.country_iso_code
+| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.name_and_vmajor, attributes.client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
-| STATS first_country_iso_code = TOP(client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.name_and_vmajor // select first and last seen values
+| STATS first_country_iso_code = TOP(attributes.client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.name_and_vmajor // select first and last seen values
 | SORT user_agent.name_and_vmajor, first_seen, last_seen, first_country_iso_code
 | LOOKUP JOIN ua_lookup ON user_agent.name_and_vmajor // lookup release_date from ua_lookup using user_agent.name_and_vmajor key
 | KEEP release_date, user_agent.name_and_vmajor, first_country_iso_code, first_seen, last_seen
@@ -104,9 +104,9 @@ Execute the following query:
 FROM logs-proxy.otel-default
 | EVAL user_agent.full = CONCAT(user_agent.name, " ", user_agent.version)
 | WHERE user_agent.full IS NOT NULL
-| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, client.geo.country_iso_code
+| STATS @timestamp.min = MIN(@timestamp), @timestamp.max = MAX(@timestamp) BY user_agent.full, attributes.client.geo.country_iso_code
 | SORT @timestamp.min ASC // sort first seen to last seen
-| STATS first_country_iso_code = TOP(client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.full
+| STATS first_country_iso_code = TOP(attributes.client.geo.country_iso_code , 1, "asc"), first_seen = MIN(@timestamp.min), last_seen = MAX(@timestamp.max) BY user_agent.full
 | SORT first_seen DESC
 | LIMIT 10 // intentionally limit to top 10 first_seen to limit LLM completions
 | EVAL prompt = CONCAT(
