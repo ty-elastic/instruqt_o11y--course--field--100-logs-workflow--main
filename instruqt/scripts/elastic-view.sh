@@ -1,5 +1,5 @@
 source /opt/workshops/elastic-retry.sh
-export $(cat /home/kubernetes-vm/env | xargs)
+export $(curl -s http://kubernetes-vm:9000/env | xargs)
 
 /opt/workshops/elastic-view.sh -v oblt
 

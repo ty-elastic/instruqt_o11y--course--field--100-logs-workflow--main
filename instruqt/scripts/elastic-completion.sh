@@ -1,5 +1,5 @@
 source /opt/workshops/elastic-retry.sh
-export $(cat /home/kubernetes-vm/env | xargs)
+export $(curl -s http://kubernetes-vm:9000/env | xargs)
 
 if [[ ! -v LLM_MODEL_ID ]]; then
     echo "LLM_MODEL_ID not set, defaulting to gpt-4.1"
@@ -32,6 +32,8 @@ fi
 # retry_command_lin init_ai_everywhere
 
 # -------------
+
+curl http://kubernetes-vm:9000/env
 
 echo "Adding completion connector"
 add_connector() {
