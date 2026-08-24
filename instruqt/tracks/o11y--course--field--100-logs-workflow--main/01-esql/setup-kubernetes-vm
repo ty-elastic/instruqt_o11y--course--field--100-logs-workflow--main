@@ -188,8 +188,10 @@ source /workspace/workshop/deploy.sh -s trading-logen -o false -c $INSTRUQT_TRAC
 
 # ------------- WAIT
 
+echo "Waiting for stream..."
 retry_command_lin curl --silent --fail --output /dev/null --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" "$ELASTICSEARCH_URL/_cat/indices/logs-proxy.otel-default?allow_no_indices=false"
 
+echo "Rollover..."
 curl -X POST "$ELASTICSEARCH_URL/logs-proxy.otel-default/_rollover" \
     --header 'Content-Type: application/json' \
     --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64"
