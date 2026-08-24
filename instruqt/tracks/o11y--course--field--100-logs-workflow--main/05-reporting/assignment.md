@@ -128,11 +128,9 @@ The CIO is concerned about us not testing new browsers sufficiently, and for som
 
 1. Click `Dashboards` in the left-hand navigation pane
 2. Open the `Ingress Status` dashboard (if not already open)
-3. Click on `Export` icon
-4. Select `Schedule exports`
+3. Click on vertical `...` icon
+4. Select `Export`
 5. Click `Schedule exports` at the bottom-right of the resulting fly-out
-
-![5_exports.png](../assets/5_exports.png)
 
 > [!NOTE]
 > In practice, you would setup an email Connector to allow Elasticsearch to automatically email the dashboard to the CIO on the schedule you defined.

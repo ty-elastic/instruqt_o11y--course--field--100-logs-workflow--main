@@ -25,21 +25,17 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 1. Select `logs-proxy.otel-default` from the list of Streams.
 2. Select the `Processing` tab
 3. Select `Create processor` from the menu `Create`
-4. Select the `Manual pipeline configuration` Processor
-5. Set the `Ingest pipeline processors` field to:
-  ```
-  [
-    {
-      "user_agent": {
-        "field": "resource.attributes.user_agent.original",
-        "target_field": "user_agent",
-        "extract_device_type": true,
-        "ignore_missing": true
-      }
-    }
-  ]
-  ```
-6. Click `Create`
+4. Select the `User agent` Processor
+5. Set the `Field` to
+```
+resource.attributes.user_agent.original
+```
+6. Set the `Target field` to
+```
+user_agent
+```
+7. Open `Advanced settings` and enable `Extract device type`
+8. Click `Create`
 
 ![4_ua1.png](../assets/4_ua1.png)
 
@@ -47,12 +43,11 @@ Remember the User Agent string we tried to group by and failed using ES|QL? Whil
 
 1. Click the `Modified fields` tab
 2. Click the ellipse on the far right of the `user_agent.name` row
-3. Select `Map field`
+3. Select `Edit field`
 4. Set the type to `Keyword`
 5. Click the ellipse on the far right of the `user_agent.version` row
-6. Select `Map field`
+6. Select `Edit field`
 7. Set the type to `Keyword`
-8. Click `Stage changes`
 
 > [!NOTE]
 > Make sure you are mapping `user_agent.name` and `user_agent.version` and not `user_agent.os.name` and `user_agent.os.version`

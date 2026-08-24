@@ -15,7 +15,7 @@ tabs:
   type: service
   hostname: kubernetes-vm
   path: /app/discover#/?_g=(filters:!(),query:(language:kuery,query:''),refreshInterval:(pause:!t,value:60000),time:(from:now-1h,to:now))&_a=(breakdownField:log.level,columns:!(),dataSource:(type:esql),filters:!(),hideChart:!f,interval:auto,query:(esql:'FROM%20logs-proxy.otel-default'),sort:!(!('@timestamp',desc)))
-  port: 443
+  port: 8443
   custom_request_headers:
   - key: Authorization
     value: Basic bGltaXRlZF91c2VyOmVsYXN0aWM=

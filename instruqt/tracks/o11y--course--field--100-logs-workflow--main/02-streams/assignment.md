@@ -112,7 +112,7 @@ Note that this graph, unlike the one we drew before, currently shows only a few 
 
 This is a useful graph! Let's save it to our dashboard for future use.
 
-1. Click on the Disk icon in the upper-right of the resulting graph
+1. Click on the square-with-a-plus icon in the upper-right of the resulting graph ("Save visualization to dashboard")
 2. Name the visualization
   ```
   Status Code Over Time

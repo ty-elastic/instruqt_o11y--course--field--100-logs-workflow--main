@@ -52,10 +52,10 @@ Now we need to map several of our new fields to the proper field type.
 
 1. Select the `Schema` tab
 2. Search for field `client.geo`
-3. Click on the ellipse on the right-hand side of the `attributes.client.geo.location` row and select `Map field`
+3. Click on the ellipse on the right-hand side of the `attributes.client.geo.location` row and select `Edit field`
 4. Set `Type` to `Geo point`
 5. Click `Stage changes`
-6. Click on the ellipse on the right-hand side of the `attributes.client.geo.country_iso_code` row and select `Map field`
+6. Click on the ellipse on the right-hand side of the `attributes.client.geo.country_iso_code` row and select `Edit field`
 7. Set `Type` to `Keyword`
 8. Click `Stage changes` in the resulting dialog
 9. Click `Submit changes` in the bottom-right
