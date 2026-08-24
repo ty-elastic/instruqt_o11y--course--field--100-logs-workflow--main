@@ -36,8 +36,8 @@ data:
         flush:
           interval: 1s
         # Enable in order to skip the SSL certificate Check
-        # tls:
-        #   insecure_skip_verify: true
+        tls:
+          insecure_skip_verify: true
         mapping:
           mode: otel
 
