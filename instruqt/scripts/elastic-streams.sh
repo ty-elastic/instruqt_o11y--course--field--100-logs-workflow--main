@@ -3,19 +3,19 @@ export $(cat /home/kubernetes-vm/env | xargs)
 
 # ------------- STREAMS
 
-echo "/api/streams/_enable"
-curl -X POST "$KIBANA_URL/api/streams/_enable" \
-    --header "kbn-xsrf: true" \
-    --header 'x-elastic-internal-origin: Kibana' \
-    --header "Authorization: ApiKey $ELASTICSEARCH_APIKEY"
+# echo "/api/streams/_enable"
+# curl -X POST "$KIBANA_URL/api/streams/_enable" \
+#     --header "kbn-xsrf: true" \
+#     --header 'x-elastic-internal-origin: Kibana' \
+#     --header "Authorization: ApiKey $ELASTICSEARCH_APIKEY"
 
-echo "/internal/kibana/settings"
-curl -X POST "$KIBANA_URL/internal/kibana/settings" \
-    --header 'Content-Type: application/json' \
-    --header "kbn-xsrf: true" \
-    --header "Authorization: ApiKey $ELASTICSEARCH_APIKEY" \
-    --header 'x-elastic-internal-origin: Kibana' \
-    -d '{"changes":{"observability:streamsEnableSignificantEvents":true}}'
+# echo "/internal/kibana/settings"
+# curl -X POST "$KIBANA_URL/internal/kibana/settings" \
+#     --header 'Content-Type: application/json' \
+#     --header "kbn-xsrf: true" \
+#     --header "Authorization: ApiKey $ELASTICSEARCH_APIKEY" \
+#     --header 'x-elastic-internal-origin: Kibana' \
+#     -d '{"changes":{"observability:streamsEnableSignificantEvents":true}}'
 
 # ------------- DATAVIEWS
 
