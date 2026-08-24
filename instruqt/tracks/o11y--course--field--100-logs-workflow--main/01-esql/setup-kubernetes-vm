@@ -181,6 +181,23 @@ curl -X PUT "$ELASTICSEARCH_URL/_security/user/limited_user" \
         "enabled": true
     }'
 
+cat <<EOF >> traefik-config.yaml
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      limited:
+        port: 9393
+        exposedPort: 9393
+        expose:
+          default: true
+EOF
+cp traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+
 cat <<EOF >> limited.yaml
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
@@ -200,7 +217,7 @@ metadata:
   name: kibana-limited-default
 spec:
   entryPoints:
-    - web
+    - limited
   routes:
     - match: "PathPrefix(`/`)"
       kind: Rule
