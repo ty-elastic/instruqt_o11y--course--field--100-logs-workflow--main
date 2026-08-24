@@ -42,8 +42,8 @@ add_connector() {
         "service": "openai",
         "service_settings": {
             "model_id": "'"$LLM_MODEL_ID"'",
-            "api_key": "'"$LLM_KEY"'",
-            "url": "'"$LLM_CHAT_URL"'"
+            "api_key": "'"$LLM_APIKEY"'",
+            "url": "https://'"$LLM_PROXY_URL"'/v1/chat/completions"
         }
     }')
 
