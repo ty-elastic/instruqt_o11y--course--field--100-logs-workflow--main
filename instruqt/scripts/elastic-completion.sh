@@ -2,8 +2,8 @@ source /opt/workshops/elastic-retry.sh
 export $(cat /home/kubernetes-vm/env | xargs)
 
 if [[ ! -v LLM_MODEL_ID ]]; then
-    echo "LLM_MODEL_ID not set, defaulting to claude-opus-4.7"
-    LLM_MODEL_ID="claude-opus-4.7"
+    echo "LLM_MODEL_ID not set, defaulting to gpt-4.1"
+    LLM_MODEL_ID="gpt-4.1"
 else
     echo "LLM_MODEL_ID=$LLM_MODEL_ID"
 fi
