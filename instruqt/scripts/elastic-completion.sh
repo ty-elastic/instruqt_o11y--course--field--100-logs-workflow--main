@@ -1,5 +1,5 @@
 source /opt/workshops/elastic-retry.sh
-export $(curl http://kubernetes-vm:9000/env | xargs)
+export $(cat /home/kubernetes-vm/env | xargs)
 
 if [[ ! -v LLM_MODEL_ID ]]; then
     echo "LLM_MODEL_ID not set, defaulting to gpt-4.1"

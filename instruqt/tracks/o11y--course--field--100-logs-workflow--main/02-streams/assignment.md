@@ -9,7 +9,7 @@ tabs:
   type: service
   hostname: kubernetes-vm
   path: /app/streams
-  port: 30001
+  port: 443
 difficulty: basic
 timelimit: 600
 enhanced_loading: false

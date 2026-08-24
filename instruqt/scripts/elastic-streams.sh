@@ -1,5 +1,5 @@
 source /opt/workshops/elastic-retry.sh
-export $(curl http://kubernetes-vm:9000/env | xargs)
+export $(cat /home/kubernetes-vm/env | xargs)
 
 # ------------- STREAMS
 
