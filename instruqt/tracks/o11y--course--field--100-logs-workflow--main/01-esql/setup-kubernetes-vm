@@ -202,15 +202,29 @@ EOF
 
 cat <<EOF >> limited.yaml
 apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: set-kb-limited-basic-auth
+spec:
+  headers:
+    customRequestHeaders:
+      X-Request-Id: "123"
+      Authorization: "Basic bGltaXRlZF91c2VyOmVsYXN0aWM="
+    customResponseHeaders:
+      X-Response-Id: "4567"
+---
+apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: kb-limited-elastic-lab
+  name: kibana-limited-default
 spec:
   entryPoints:
     - highwebsecure
   routes:
-    - match: "Host(`kb-limited.elastic.lab`)"
+    - match: "PathPrefix(`/`)"
       kind: Rule
+      middlewares:
+        - name: set-kb-limited-basic-auth
       services:
         - name: kibana-kb-http
           port: 5601
