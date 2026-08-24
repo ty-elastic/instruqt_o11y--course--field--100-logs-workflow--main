@@ -33,8 +33,6 @@ fi
 
 # -------------
 
-cat /home/kubernetes-vm/env
-
 echo "Adding completion connector"
 add_connector() {
     local http_status=$(curl -s -o /dev/null -w "%{http_code}" -X PUT "$ELASTICSEARCH_URL/_inference/completion/openai_completion" \

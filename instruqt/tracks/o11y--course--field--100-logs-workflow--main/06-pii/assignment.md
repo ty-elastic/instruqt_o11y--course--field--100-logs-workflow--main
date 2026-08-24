@@ -69,25 +69,18 @@ While we've removed access to the `attributes.client.ip` field for the limited v
 3. Select `logs-proxy.otel-default` from the list of Streams.
 4. Select the `Processing` tab
 5. Select `Create processor` from the menu `Create`
-6. Select the `Manual pipeline configuration` Processor
-7. Set the `Ingest pipeline processors` field to:
+6. Select the `Redact` Processor
+7. Set the `Field` field to:
   ```
-  [
-    {
-      "redact": {
-        "field": "body.text",
-        "patterns": [
-          "%{IP:client_ip}"
-        ],
-        "ignore_missing": true,
-        "ignore_failure": true
-      }
-    }
-  ]
+  body.text
   ```
-8. Click `Create`
-9. Click `Save changes` in the bottom-right
-10. Click `Confirm changes` in the resulting dialog
+8. Set the `Patterns` field to:
+  ```
+  %{IP:client_ip}
+  ```
+9. Click `Create`
+10. Click `Save changes` in the bottom-right
+11. Click `Confirm changes` in the resulting dialog
 
 > [!NOTE]
 > This redaction will apply to ALL roles, not just the limited viewer
