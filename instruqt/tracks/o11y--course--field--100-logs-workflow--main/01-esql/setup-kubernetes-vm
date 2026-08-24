@@ -188,6 +188,10 @@ source /workspace/workshop/deploy.sh -s trading-logen -o false -c $INSTRUQT_TRAC
 
 # ------------- WAIT
 
+kubectl create clusterrolebinding elastic-cluster-admin-binding \
+  --clusterrole=cluster-admin \
+  --user=elastic
+
 echo "Waiting for stream..."
 retry_command_lin curl --silent --fail --output /dev/null --header "Authorization: Basic $ELASTICSEARCH_AUTH_BASE64" "$ELASTICSEARCH_URL/_cat/indices/logs-proxy.otel-default?allow_no_indices=false"
 
