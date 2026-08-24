@@ -184,10 +184,7 @@ curl -X PUT "$ELASTICSEARCH_URL/_security/user/limited_user" \
 
 # ------------- DEPLOY
 
-ls
-cd /workspace/workshop
-ls
-./deploy.sh -s trading-logen -o false -c $INSTRUQT_TRACK_SLUG -v $INSTRUQT_TRACK_SLUG
+source /workspace/workshop/deploy.sh -s trading-logen -o false -c $INSTRUQT_TRACK_SLUG -v $INSTRUQT_TRACK_SLUG
 
 # ------------- WAIT
 
