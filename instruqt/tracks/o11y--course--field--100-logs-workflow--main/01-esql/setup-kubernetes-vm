@@ -181,56 +181,6 @@ curl -X PUT "$ELASTICSEARCH_URL/_security/user/limited_user" \
         "enabled": true
     }'
 
-cat <<EOF >> traefik-config.yaml
-apiVersion: helm.cattle.io/v1
-kind: HelmChartConfig
-metadata:
-  name: traefik
-  namespace: kube-system
-spec:
-  valuesContent: |-
-    ports:
-      limited:
-        port: 9393
-        exposedPort: 9393
-        expose:
-          default: true
-EOF
-cp traefik-config.yaml /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
-
-cat <<EOF >> limited.yaml
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: set-kb-limited-basic-auth
-spec:
-  headers:
-    customRequestHeaders:
-      X-Request-Id: "123"
-      Authorization: "Basic bGltaXRlZF91c2VyOmVsYXN0aWM="
-    customResponseHeaders:
-      X-Response-Id: "4567"
----
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: kibana-limited-default
-spec:
-  entryPoints:
-    - limited
-  routes:
-    - match: "PathPrefix(`/`)"
-      kind: Rule
-      middlewares:
-        - name: set-kb-limited-basic-auth
-      services:
-        - name: kibana-kb-http
-          port: 5601
-          scheme: https
-          serversTransport: fleet-insecure
-EOF
-kubectl apply -f limited.yaml
-
 # ------------- DEPLOY
 
 source /workspace/workshop/deploy.sh -s trading-logen -o false -c $INSTRUQT_TRACK_SLUG -v $INSTRUQT_TRACK_SLUG

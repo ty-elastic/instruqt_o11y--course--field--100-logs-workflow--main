@@ -10,59 +10,27 @@ tabs:
   hostname: kubernetes-vm
   path: /app/discover#/?_g=(filters:!(),query:(language:kuery,query:''),refreshInterval:(pause:!t,value:60000),time:(from:now-1h,to:now))&_a=(breakdownField:log.level,columns:!(),dataSource:(type:esql),filters:!(),hideChart:!f,interval:auto,query:(esql:'FROM%20logs-proxy.otel-default'),sort:!(!('@timestamp',desc)))
   port: 443
-- id: qxodixi0jlll
-  title: Elasticsearch (Limited)
-  type: service
-  hostname: kubernetes-vm
-  path: /app/discover#/?_g=(filters:!(),query:(language:kuery,query:''),refreshInterval:(pause:!t,value:60000),time:(from:now-1h,to:now))&_a=(breakdownField:log.level,columns:!(),dataSource:(type:esql),filters:!(),hideChart:!f,interval:auto,query:(esql:'FROM%20logs-proxy.otel-default'),sort:!(!('@timestamp',desc)))
-  port: 9393
-  custom_request_headers:
-  - key: Authorization
-    value: Basic bGltaXRlZF91c2VyOmVsYXN0aWM=
 difficulty: basic
 timelimit: 600
 enhanced_loading: false
 ---
-Sometimes our data contains PII information which needs to be restricted to a need-to-know basis and kept only for a limited time.
-
-# Limiting access
-
-With Elastic's in-built support for [RBAC](https://www.elastic.co/docs/deploy-manage/users-roles/cluster-or-deployment-auth/user-roles), we can limit access at the index, document, or field level.
-
-In this example, we've created a limited_user with a limited_role which restricts access to the `attributes.client.ip` and `body.text` fields (to avoid implicitly leaking the `attributes.client.ip`).
-
-In the Elasticsearch tab, we are logged in as a user with full privileges. Let's check our access.
-1. Open the [button label="Elasticsearch"](tab-0) tab
-2. Open the first log record by clicking on the double arrow icon under `Actions`
-3. Click on the `Table` tab in the flyout
-3. Note that the `attributes.client.ip` and `body.text` fields are accessible and shown
-
-In the Elasticsearch (Limited) tab, we are logged in as a user with limited privileges. Let's check our access.
-
-1. Open the [button label="Elasticsearch (Limited)"](tab-1) tab
-2. Open the first log record by clicking on the double arrow icon under `Actions`
-3. Click on the `Table` tab in the flyout
-4. Note that the `attributes.client.ip` and `body.text` fields are not accessible and not shown
-
-Let's change permissions and see what happens:
-
-1. Open the [button label="Elasticsearch"](tab-0) tab
-2. Go to `Management` > `Stack Management` > `Security` > `Roles` using the left-hand navigation pane
-3. Find the role `limited_viewer` and click on the pencil icon to the right of that row to edit it
-4. For Indices `logs-proxy.otel-default`, update `Denied fields` to remove `body.text` (it should only contain `attributes.client.ip`)
-5. Click `Update role`
-
-Now let's ensure our limited user has access to a redacted `body.text`.
-
-1. Open the [button label="Elasticsearch (Limited)"](tab-1) Instruqt tab
-2. Close the open log record flyout
-3. Run the search query again
-4. Open the first log record by clicking on the double arrow icon under `Actions`
-5. Note that `attributes.client.ip` is not accessible, but `body.text` is
+Sometimes our data contains PII information which needs to be redacted and kept only for a limited time.
 
 # Redaction
 
-While we've removed access to the `attributes.client.ip` field for the limited viewer, the client's IP address is still visible in `body.text`. Fortunately, Elasticsearch has a processor easily and automatically redact such PII information.
+Let's have a look again at our proxy log records. 
+
+1. Open the [button label="Elasticsearch"](tab-0) tab
+2. Click `Discover` in the left-hand navigation pane
+3. Execute the following query:
+```esql
+FROM logs-proxy.otel-default
+```
+4. Open the first log record by clicking on the double arrow icon under `Actions`
+5. Click on the `Table` tab in the flyout
+6. Note that the client's IP address is visible in `body.text`
+
+Fortunately, Elasticsearch has a processor easily and automatically redact such PII information.
 
 1. Open the [button label="Elasticsearch"](tab-0) tab
 2. Go to `Streams` using the left-hand navigation pane
@@ -94,7 +62,7 @@ FROM logs-proxy.otel-default
 
 1. Open the first log record by clicking on the double arrow icon under `Actions`
 2. Click on the `Table` tab in the flyout
-3. Note that any presence of the client's ip address in `body.text` has been redacted as `<client_ip>`, yet non-limited viewers will still be able to see client ip explicitly in the field `attributes.client.ip`
+3. Note that any presence of the client's ip address in `body.text` has been redacted as `<client_ip>`
 
 # Summary
 
@@ -120,8 +88,7 @@ And what we've done:
 * Created a table in our dashboard iterating User Agents in the wild
 * Created a nightly report to snapshot our dashboard
 * Created an alert to let us know when a new User Agent string appears
-* Setup RBAC to restrict access to `client.ip`
-* Setup Redaction to remove IP addresses from the log message body
+* Setup redaction to remove IP addresses from the log message body
 
 # Wrap-Up
 
@@ -137,7 +104,7 @@ Over the course of this lab, we learned about:
 * Using Maps to visualize geographic information
 * Scheduling dashboard reports
 * Setting up a Pivot Transform and Alert
-* Setting up RBAC
+* Setting up redaction
 
 We put these technologies to use in a practical workflow which quickly took us from an unknown problem to a definitive Root Cause. Furthermore, we've setup alerts to ensure we aren't caught off-guard in the future. Finally, we built a really nice custom dashboard to help us monitor the health of our Ingress Status.
 
